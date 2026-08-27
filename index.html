@@ -45,7 +45,7 @@
 <body>
 <div class="container">
   <h1>工单统计报表</h1>
-  <div class="subtitle">统计周期：2025-05-30 至 2026-08-26 · 数据来源：FBI 多维度数据汇总（1818098）</div>
+  <div class="subtitle">数据范围：2025-05-30 至 2026-08-26 · 默认查询：2026-08-01 至 2026-08-27 · 数据来源：FBI 多维度数据汇总（1818098）</div>
 
   <div class="filters">
     <label for="startDate">开始日期</label>
@@ -92,7 +92,7 @@
     6. 差评工单数 = 是否差评 =「是」 或 会话状态 ≠「已解决」的工单数（FBI 明细未提供服务分、是否投诉升级字段，以此口径近似）。<br>
     7. 答疑交互次数分布：≤3次、4-5次、6-10次、&gt;10次。<br>
     8. 达标标准：首轮10分钟响应率 ≥ 80% 且 1小时解决率 ≥ 80% 且 差评工单数 = 0；评价列会列出未达标项。<br>
-    9. 工单量前三的责任人名称后显示金/银/铜奖牌；页面顶部日期范围可实时筛选表格与指标。
+    9. 工单量前三的责任人名称后显示金/银/铜奖牌；页面顶部日期范围可实时筛选表格与指标，默认查询范围为当月1日至今。
   </div>
 </div>
 <script>
@@ -62338,14 +62338,14 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('startDate').value = '2025-05-30';
-      document.getElementById('endDate').value = '2026-08-26';
+      document.getElementById('startDate').value = '2026-08-01';
+      document.getElementById('endDate').value = '2026-08-27';
       render();
       document.getElementById('startDate').addEventListener('change', render);
       document.getElementById('endDate').addEventListener('change', render);
       document.getElementById('resetBtn').addEventListener('click', () => {
-        document.getElementById('startDate').value = '2025-05-30';
-        document.getElementById('endDate').value = '2026-08-26';
+        document.getElementById('startDate').value = '2026-08-01';
+        document.getElementById('endDate').value = '2026-08-27';
         render();
       });
     });

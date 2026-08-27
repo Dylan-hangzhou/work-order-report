@@ -27,13 +27,10 @@
     .data-table tbody tr:last-child td { font-weight: 700; background: #f8fafc; border-top: 2px solid #d0d7e2; }
     .data-table td.left { text-align: left; }
     .data-table td.bold { font-weight: 700; }
-    .medal { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 13px; font-weight: 800; color: #fff; margin-right: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.25); }
+    .medal { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 13px; font-weight: 800; color: #fff; margin-left: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.25); }
     .medal.gold { background: linear-gradient(135deg,#ffd700,#ff8c00); color:#5c4500; }
     .medal.silver { background: linear-gradient(135deg,#f5f5f5,#a0a0a0); color:#333; }
     .medal.bronze { background: linear-gradient(135deg,#ffac33,#e65100); color:#fff; }
-    .rank-1 td:first-child { background: rgba(255,215,0,0.12); }
-    .rank-2 td:first-child { background: rgba(192,192,192,0.12); }
-    .rank-3 td:first-child { background: rgba(205,127,50,0.12); }
     .target-ok { color: #2e7d32; font-weight: 700; }
     .target-miss { color: #c62828; font-weight: 700; }
     .tag-ok { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 6px; font-weight: 600; }
@@ -68,7 +65,6 @@
   <table class="data-table">
     <thead>
       <tr>
-        <th>排名</th>
         <th style="text-align:left;">业务分类</th>
         <th style="text-align:left;">工单责任人</th>
         <th>工单量</th>
@@ -88,13 +84,13 @@
   <div class="note">
     <strong>口径说明</strong><br>
     1. 数据来源：FBI 报表 1818098「FY26财年答疑小蜜汇总」-> 小蜜答疑明细，日期范围 2026-08-01 至 2026-08-26，租户仅包含「商家系统运维小蜜」和「菜鸟/全球供应链/进口供应链」。<br>
-    2. 业务分类：仅展示「快消标准商家（大紫团队）」「食品（含冷链）」「消电&家居」「潮玩服饰」「M2C及猫超外单」「进口供应链」六个分类，其余全部归入「其他」；同一分类内按工单量降序排列。<br>
+    2. 业务分类：菜鸟/全球供应链/进口供应链默认「进口供应链」；商家系统运维小蜜从「用户提问表单」JSON 中的业务分类字段提取，无法提取时沿用原字段；仅展示上述六个固定分类，其余归入「其他」；同一分类内按工单量降序排列。<br>
     3. 首轮10分钟响应率 = 责任人首答响应时间 &lt; 600 秒（10分钟）的工单 / 有首答响应时间的工单。<br>
     4. 1小时解决率 = 责任人会话耗时 / 60 &lt; 60 分钟（即 3600 秒内）的工单 / 有会话耗时的工单（FBI 明细未提供独立「解决时长」，以「责任人会话耗时」替代）。<br>
     5. 差评工单数 = 是否差评 =「是」 或 会话状态 ≠「已解决」的工单数（FBI 明细未提供服务分、是否投诉升级字段，以此口径近似）。<br>
     6. 答疑交互次数分布：≤3次、4-5次、6-10次、&gt;10次。<br>
     7. 达标标准：首轮10分钟响应率 ≥ 80% 且 1小时解决率 ≥ 80% 且 差评工单数 = 0；评价列会列出未达标项。<br>
-    8. 页面顶部日期范围可实时筛选表格与指标。
+    8. 工单量前三的责任人名称后显示金/银/铜奖牌；页面顶部日期范围可实时筛选表格与指标。
   </div>
 </div>
 <script>
@@ -8496,6 +8492,12 @@
         return b.total - a.total;
       });
 
+      // top 3 owners by ticket volume across all groups
+      const rankedByTotal = [...groups].sort((a, b) => b.total - a.total);
+      const gold = rankedByTotal[0];
+      const silver = rankedByTotal[1];
+      const bronze = rankedByTotal[2];
+
       // overall metrics
       let total = rows.length;
       let firstValid = 0, firstOk = 0, solveValid = 0, solveOk = 0, negative = 0;
@@ -8519,15 +8521,13 @@
       const tbody = document.getElementById('table-body');
       let html = '';
       if (groups.length === 0) {
-        html = '<tr><td colspan="13" style="text-align:center;color:#888;">所选日期范围内无数据</td></tr>';
+        html = '<tr><td colspan="12" style="text-align:center;color:#888;">所选日期范围内无数据</td></tr>';
       } else {
         groups.forEach((g, idx) => {
-          const rank = idx + 1;
-          let rankCell = rank;
-          let rowClass = '';
-          if (rank === 1) { rankCell = '<span class="medal gold">1</span>'; rowClass = 'rank-1'; }
-          else if (rank === 2) { rankCell = '<span class="medal silver">2</span>'; rowClass = 'rank-2'; }
-          else if (rank === 3) { rankCell = '<span class="medal bronze">3</span>'; rowClass = 'rank-3'; }
+          let medal = '';
+          if (g === gold) medal = ' <span class="medal gold">1</span>';
+          else if (g === silver) medal = ' <span class="medal silver">2</span>';
+          else if (g === bronze) medal = ' <span class="medal bronze">3</span>';
 
           const firstRate = g.firstValid ? (g.firstOk/g.firstValid*100).toFixed(1) : '0.0';
           const solveRate = g.solveValid ? (g.solveOk/g.solveValid*100).toFixed(1) : '0.0';
@@ -8545,10 +8545,9 @@
             evalHtml = '<span class="tag-need">' + problems.join('、') + ' 未达标</span>';
           }
 
-          html += `<tr class="${rowClass}">
-            <td class="bold">${rankCell}</td>
+          html += `<tr>
             <td class="left">${escapeHtml(g.category)}</td>
-            <td class="left bold">${escapeHtml(g.owner)}</td>
+            <td class="left bold">${escapeHtml(g.owner)}${medal}</td>
             <td>${g.total}</td>
             <td class="${firstClass}">${firstRate}%</td>
             <td class="${solveClass}">${solveRate}%</td>
@@ -8573,7 +8572,6 @@
         const totalFirstRate = totalFirstValid ? (totalFirstOk/totalFirstValid*100).toFixed(1) : '0.0';
         const totalSolveRate = totalSolveValid ? (totalSolveOk/totalSolveValid*100).toFixed(1) : '0.0';
         html += `<tr>
-          <td>—</td>
           <td class="left">合计</td>
           <td class="left">—</td>
           <td>${total}</td>

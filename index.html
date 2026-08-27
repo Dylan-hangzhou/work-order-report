@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工单统计报表</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 40px; background: #f5f7fa; color: #333; }
+.container { max-width: 1280px; margin: 0 auto; }
+h1 { font-size: 26px; margin-bottom: 8px; }
+.subtitle { color: #666; margin-bottom: 24px; font-size: 14px; }
+.metrics { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.metric-card { background: #fff; border-radius: 8px; padding: 18px 22px; min-width: 160px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); flex: 1; }
+.metric-label { font-size: 13px; color: #666; margin-bottom: 6px; }
+.metric-value { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+.data-table { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.08); font-size: 14px; }
+.data-table thead th { background: #4a6fa5; color: #fff; padding: 14px 10px; text-align: center; font-weight: 600; border-bottom: 1px solid #3b5a84; white-space: nowrap; }
+.data-table tbody td { padding: 12px 10px; text-align: center; border-bottom: 1px solid #eef1f5; vertical-align: middle; }
+.data-table tbody tr:hover td { background: #f4f8ff; }
+.data-table tbody tr:last-child td { font-weight: 700; background: #f8fafc; border-top: 2px solid #d0d7e2; }
+.data-table td.left { text-align: left; }
+.data-table td.bold { font-weight: 700; }
+.medal { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 13px; font-weight: 800; color: #fff; margin-right: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.25); }
+.medal.gold { background: linear-gradient(135deg,#ffea00,#ff9100); color:#5c3d00; }
+.medal.silver { background: linear-gradient(135deg,#f5f5f5,#8a8a8a); color:#333; }
+.medal.bronze { background: linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
+.rank-1 td:first-child { background: rgba(255,215,0,0.12); }
+.rank-2 td:first-child { background: rgba(192,192,192,0.12); }
+.rank-3 td:first-child { background: rgba(205,127,50,0.12); }
+.target-ok { color: #2e7d32; font-weight: 700; }
+.target-miss { color: #c62828; font-weight: 700; }
+.tag-ok { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 6px; font-weight: 600; }
+.tag-need { display: inline-block; background: #ffebee; color: #c62828; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 6px; font-weight: 600; }
+.high-interaction { display: inline-block; background: #fff3e0; color: #e65100; padding: 3px 8px; border-radius: 6px; font-weight: 700; }
+.high-icon { margin-right: 3px; }
+.note { margin-top: 22px; font-size: 13px; color: #555; line-height: 1.7; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.note strong { color: #333; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>工单统计报表</h1>
+<div class="subtitle">统计周期：2026-08-24 至 2026-08-26 · 数据来源：工单明细</div>
+<div class="metrics">
+  <div class="metric-card"><div class="metric-label">工单总量</div><div class="metric-value">106</div></div>
+  <div class="metric-card"><div class="metric-label">首轮10分钟响应率</div><div class="metric-value">79.2%</div></div>
+  <div class="metric-card"><div class="metric-label">1小时解决率</div><div class="metric-value">83.0%</div></div>
+  <div class="metric-card"><div class="metric-label">差评工单数</div><div class="metric-value">75</div></div>
+</div>
+<table class="data-table"><thead><tr><th>业务分类</th><th>工单责任人</th><th>工单量</th><th>首轮10分内工单数</th><th>首轮10分钟内响应率</th><th>解决<60分钟工单数</th><th>1小时解决率</th><th>差评工单数</th><th>交互≤3次</th><th>交互4-5次</th><th>交互6-10次</th><th>交互>10次</th></tr></thead><tbody><tr class="rank-2"><td class="left"><span class="medal silver">2</span>M2C及猫超外单</td>
+<td>周玲玲</td>
+<td class="bold">14</td>
+<td>14</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>10</td>
+<td><span class="target-miss">71.4%</span><span class="tag-need">需加油</span></td>
+<td>12</td>
+<td>12</td>
+<td>0</td>
+<td>1</td>
+<td><span class="high-icon">⚠️</span><span class="high-interaction">1</span></td></tr><tr class="rank-2"><td class="left"><span class="medal silver">2</span>M2C及猫超外单</td>
+<td>裴玉</td>
+<td class="bold">14</td>
+<td>8</td>
+<td><span class="target-miss">57.1%</span><span class="tag-need">需加油</span></td>
+<td>12</td>
+<td><span class="target-ok">85.7%</span><span class="tag-ok">已达标</span></td>
+<td>7</td>
+<td>11</td>
+<td>1</td>
+<td>2</td>
+<td>0</td></tr><tr class=""><td class="left">快消标准商家（大紫团队）</td>
+<td>周玲玲</td>
+<td class="bold">6</td>
+<td>6</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>5</td>
+<td><span class="target-ok">83.3%</span><span class="tag-ok">已达标</span></td>
+<td>6</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td><span class="high-icon">⚠️</span><span class="high-interaction">1</span></td></tr><tr class=""><td class="left">快消标准商家（大紫团队）</td>
+<td>裴玉</td>
+<td class="bold">6</td>
+<td>6</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>5</td>
+<td><span class="target-ok">83.3%</span><span class="tag-ok">已达标</span></td>
+<td>4</td>
+<td>5</td>
+<td>0</td>
+<td>1</td>
+<td>0</td></tr><tr class=""><td class="left">标准商家组</td>
+<td>唐伯文</td>
+<td class="bold">1</td>
+<td>1</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>1</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td></tr><tr class=""><td class="left">标准商家组</td>
+<td>裴玉</td>
+<td class="bold">1</td>
+<td>1</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>0</td>
+<td><span class="target-miss">0.0%</span><span class="tag-need">需加油</span></td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td></tr><tr class=""><td class="left">标准商家组</td>
+<td>赵烈幸</td>
+<td class="bold">1</td>
+<td>1</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>1</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td></tr><tr class="rank-2"><td class="left"><span class="medal silver">2</span>消电&家居</td>
+<td>赵烈幸</td>
+<td class="bold">14</td>
+<td>12</td>
+<td><span class="target-ok">85.7%</span><span class="tag-ok">已达标</span></td>
+<td>11</td>
+<td><span class="target-miss">78.6%</span><span class="tag-need">需加油</span></td>
+<td>9</td>
+<td>10</td>
+<td>2</td>
+<td>2</td>
+<td>0</td></tr><tr class=""><td class="left">消电&家居</td>
+<td>黄豪</td>
+<td class="bold">4</td>
+<td>4</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>4</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>3</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td></tr><tr class=""><td class="left">潮玩服饰</td>
+<td>王辉</td>
+<td class="bold">8</td>
+<td>7</td>
+<td><span class="target-ok">87.5%</span><span class="tag-ok">已达标</span></td>
+<td>8</td>
+<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
+<td>7</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>0</td></tr><tr class=""><td class="left">潮玩服饰</td>
+<td>马浩楠</td>
+<td class="bold">5</td>
+<td>2</td>
+<td><span class="target-miss">40.0%</span><span class="tag-need">需加油</span></td>
+<td>4</td>
+<td><span class="target-ok">80.0%</span><span class="tag-ok">已达标</span></td>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>0</td></tr><tr class="rank-1"><td class="left"><span class="medal gold">1</span>食品（含冷链）</td>
+<td>唐伯文</td>
+<td class="bold">19</td>
+<td>16</td>
+<td><span class="target-ok">84.2%</span><span class="tag-ok">已达标</span></td>
+<td>17</td>
+<td><span class="target-ok">89.5%</span><span class="tag-ok">已达标</span></td>
+<td>12</td>
+<td>12</td>
+<td>4</td>
+<td>2</td>
+<td><span class="high-icon">⚠️</span><span class="high-interaction">1</span></td></tr><tr class="rank-3"><td class="left"><span class="medal bronze">3</span>食品（含冷链）</td>
+<td>墨岱</td>
+<td class="bold">13</td>
+<td>6</td>
+<td><span class="target-miss">46.2%</span><span class="tag-need">需加油</span></td>
+<td>10</td>
+<td><span class="target-miss">76.9%</span><span class="tag-need">需加油</span></td>
+<td>9</td>
+<td>9</td>
+<td>2</td>
+<td>2</td>
+<td>0</td></tr><tr class="total-row"><td class="left bold">总计</td>
+<td></td>
+<td class="bold">106</td>
+<td>84</td>
+<td><span class="target-miss">79.2%</span><span class="tag-need">需加油</span></td>
+<td>88</td>
+<td><span class="target-ok">83.0%</span><span class="tag-ok">已达标</span></td>
+<td>75</td>
+<td>81</td>
+<td>11</td>
+<td>11</td>
+<td><span class="high-icon">⚠️</span><span class="high-interaction">3</span></td></tr></tbody></table>
+<div class="note">
+  <strong>统计口径说明：</strong><br>
+  · 首轮10分钟内响应率 = <strong>责任人首答响应时长/秒</strong> &lt; 600 秒，目标值 80%（未达标标红并提示“需加油”）<br>
+  · 1小时解决率 = 解决时长/分 &lt; 60 分钟，目标值 80%（未达标标红并提示“需加油”）<br>
+  · 差评工单数 = 服务分 &lt; 5 分 或 是否投诉升级 = 是 或 是否解决 = 否（任一满足即计为差评）<br>
+  · 交互次数分布：人工交互轮次 ≤3 / 4-5 / 6-10 / &gt;10 次（&gt;10 次非零单元格高亮并带警示图标）<br>
+  · 工单量前三（按 dense 排名）分别展示金/银/铜奖牌
+</div>
+</div>
+</body>
+</html>

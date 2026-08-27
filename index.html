@@ -3,213 +3,7031 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>工单统计报表</title>
+<title>工单统计报表（FBI 数据源）</title>
 <style>
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 40px; background: #f5f7fa; color: #333; }
-.container { max-width: 1280px; margin: 0 auto; }
-h1 { font-size: 26px; margin-bottom: 8px; }
-.subtitle { color: #666; margin-bottom: 24px; font-size: 14px; }
-.metrics { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-.metric-card { background: #fff; border-radius: 8px; padding: 18px 22px; min-width: 160px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); flex: 1; }
-.metric-label { font-size: 13px; color: #666; margin-bottom: 6px; }
-.metric-value { font-size: 24px; font-weight: 600; color: #1a1a1a; }
-.data-table { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.08); font-size: 14px; }
-.data-table thead th { background: #4a6fa5; color: #fff; padding: 14px 10px; text-align: center; font-weight: 600; border-bottom: 1px solid #3b5a84; white-space: nowrap; }
-.data-table tbody td { padding: 12px 10px; text-align: center; border-bottom: 1px solid #eef1f5; vertical-align: middle; }
-.data-table tbody tr:hover td { background: #f4f8ff; }
-.data-table tbody tr:last-child td { font-weight: 700; background: #f8fafc; border-top: 2px solid #d0d7e2; }
-.data-table td.left { text-align: left; }
-.data-table td.bold { font-weight: 700; }
-.medal { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 13px; font-weight: 800; color: #fff; margin-right: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.25); }
-.medal.gold { background: linear-gradient(135deg,#ffea00,#ff9100); color:#5c3d00; }
-.medal.silver { background: linear-gradient(135deg,#f5f5f5,#8a8a8a); color:#333; }
-.medal.bronze { background: linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
-.rank-1 td:first-child { background: rgba(255,215,0,0.12); }
-.rank-2 td:first-child { background: rgba(192,192,192,0.12); }
-.rank-3 td:first-child { background: rgba(205,127,50,0.12); }
-.target-ok { color: #2e7d32; font-weight: 700; }
-.target-miss { color: #c62828; font-weight: 700; }
-.tag-ok { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 6px; font-weight: 600; }
-.tag-need { display: inline-block; background: #ffebee; color: #c62828; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 6px; font-weight: 600; }
-.high-interaction { display: inline-block; background: #fff3e0; color: #e65100; padding: 3px 8px; border-radius: 6px; font-weight: 700; }
-.high-icon { margin-right: 3px; }
-.note { margin-top: 22px; font-size: 13px; color: #555; line-height: 1.7; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.note strong { color: #333; }
+
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f4f6f9; margin: 0; color: #333; }
+    .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+    h1 { font-size: 28px; margin-bottom: 6px; color: #1a202c; }
+    .subtitle { color: #718096; font-size: 14px; margin-bottom: 20px; }
+    .filters { background: #fff; padding: 16px 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 22px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+    .filters label { font-size: 14px; color: #555; font-weight: 600; }
+    .filters input[type="date"] { border: 1px solid #d0d7e2; border-radius: 6px; padding: 6px 10px; font-size: 14px; color: #333; }
+    .filters button { background: #3182ce; color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 14px; cursor: pointer; }
+    .filters button:hover { background: #2b6cb0; }
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 26px; }
+    .metric-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center; }
+    .metric-label { font-size: 13px; color: #718096; margin-bottom: 8px; }
+    .metric-value { font-size: 28px; font-weight: 800; color: #2d3748; }
+    .data-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); font-size: 14px; }
+    .data-table th { background: #edf2f7; color: #4a5568; font-weight: 700; padding: 12px 14px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+    .data-table td { padding: 12px 14px; text-align: center; border-bottom: 1px solid #edf2f7; }
+    .data-table tbody tr:hover { background: #f7fafc; }
+    .data-table tbody tr:last-child td { font-weight: 700; background: #f8fafc; border-top: 2px solid #d0d7e2; }
+    .data-table td.left { text-align: left; }
+    .data-table td.bold { font-weight: 700; }
+    .medal { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 13px; font-weight: 800; color: #fff; margin-right: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.25); }
+    .medal.gold { background: linear-gradient(135deg,#ffea00,#ff9100); color:#5c4500; }
+    .medal.silver { background: linear-gradient(135deg,#f5f5f5,#8a8a8a); color:#333; }
+    .medal.bronze { background: linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
+    .rank-1 td:first-child { background: rgba(255,215,0,0.12); }
+    .rank-2 td:first-child { background: rgba(192,192,192,0.12); }
+    .rank-3 td:first-child { background: rgba(205,127,50,0.12); }
+    .target-ok { color: #2e7d32; font-weight: 700; }
+    .target-miss { color: #c62828; font-weight: 700; }
+    .tag-ok { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 6px; font-weight: 600; }
+    .tag-need { display: inline-block; background: #ffebee; color: #c62828; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 6px; font-weight: 600; }
+    .high-interaction { display: inline-block; background: #fff3e0; color: #e65100; padding: 3px 8px; border-radius: 6px; font-weight: 700; }
+    .high-icon { margin-right: 3px; }
+    .note { margin-top: 22px; font-size: 13px; color: #555; line-height: 1.7; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .note strong { color: #333; }
+    
 </style>
 </head>
 <body>
 <div class="container">
-<h1>工单统计报表</h1>
-<div class="subtitle">统计周期：2026-08-24 至 2026-08-26 · 数据来源：工单明细</div>
-<div class="metrics">
-  <div class="metric-card"><div class="metric-label">工单总量</div><div class="metric-value">106</div></div>
-  <div class="metric-card"><div class="metric-label">首轮10分钟响应率</div><div class="metric-value">79.2%</div></div>
-  <div class="metric-card"><div class="metric-label">1小时解决率</div><div class="metric-value">83.0%</div></div>
-  <div class="metric-card"><div class="metric-label">差评工单数</div><div class="metric-value">75</div></div>
+  <h1>工单统计报表</h1>
+  <div class="subtitle">统计周期：2026-08-01 至 2026-08-27 · 数据来源：FBI 多维度数据汇总（1818098）</div>
+
+  <div class="filters">
+    <label for="startDate">开始日期</label>
+    <input type="date" id="startDate">
+    <label for="endDate">结束日期</label>
+    <input type="date" id="endDate">
+    <button id="resetBtn">重置</button>
+  </div>
+
+  <div class="metrics">
+    <div class="metric-card"><div class="metric-label">工单总量</div><div class="metric-value" id="m-total">—</div></div>
+    <div class="metric-card"><div class="metric-label">首轮10分钟响应率</div><div class="metric-value" id="m-first">—</div></div>
+    <div class="metric-card"><div class="metric-label">已解决率</div><div class="metric-value" id="m-solve">—</div></div>
+    <div class="metric-card"><div class="metric-label">非已解决工单数</div><div class="metric-value" id="m-negative">—</div></div>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>排名</th>
+        <th style="text-align:left;">业务分类</th>
+        <th style="text-align:left;">工单责任人</th>
+        <th>工单量</th>
+        <th>首轮10分钟响应率</th>
+        <th>已解决率</th>
+        <th>非已解决工单数</th>
+        <th>平均交互轮次</th>
+        <th>&gt;10 次交互</th>
+        <th>评价</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+
+  <div class="note">
+    <strong>口径说明</strong><br>
+    1. 数据来源：FBI 报表 1818098「FY26财年答疑小蜜汇总」-> 小蜜答疑明细，日期范围 2026-08-01 至 2026-08-27，租户仅包含「商家系统运维小蜜」和「菜鸟/全球供应链/进口供应链」。<br>
+    2. 业务分类：菜鸟/全球供应链/进口供应链默认「进口供应链」；商家系统运维小蜜从「用户提问表单」JSON 中的业务分类字段提取，无法提取时沿用原字段。<br>
+    3. 首轮10分钟响应率 = 责任人首答响应时间 &lt; 600 秒（10分钟）的工单 / 有首答响应时间的工单。<br>
+    4. 已解决率 = 会话状态为「已解决」的工单 / 总工单（原 Excel 中的「1小时解决率」依赖解决时长字段，FBI 明细未提供，故用已解决率替代）。<br>
+    5. 非已解决工单数 = 会话状态不是「已解决」的工单数（原「差评工单数」依赖服务分/投诉升级字段，FBI 明细未提供，故用此口径替代）。<br>
+    6. 达标标准：首轮10分钟响应率 ≥ 80% 且已解决率 ≥ 80%。<br>
+    7. 页面顶部的日期范围可实时筛选表格和指标。
+  </div>
 </div>
-<table class="data-table"><thead><tr><th>业务分类</th><th>工单责任人</th><th>工单量</th><th>首轮10分内工单数</th><th>首轮10分钟内响应率</th><th>解决<60分钟工单数</th><th>1小时解决率</th><th>差评工单数</th><th>交互≤3次</th><th>交互4-5次</th><th>交互6-10次</th><th>交互>10次</th></tr></thead><tbody><tr class="rank-2"><td class="left"><span class="medal silver">2</span>M2C及猫超外单</td>
-<td>周玲玲</td>
-<td class="bold">14</td>
-<td>14</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>10</td>
-<td><span class="target-miss">71.4%</span><span class="tag-need">需加油</span></td>
-<td>12</td>
-<td>12</td>
-<td>0</td>
-<td>1</td>
-<td><span class="high-icon">⚠️</span><span class="high-interaction">1</span></td></tr><tr class="rank-2"><td class="left"><span class="medal silver">2</span>M2C及猫超外单</td>
-<td>裴玉</td>
-<td class="bold">14</td>
-<td>8</td>
-<td><span class="target-miss">57.1%</span><span class="tag-need">需加油</span></td>
-<td>12</td>
-<td><span class="target-ok">85.7%</span><span class="tag-ok">已达标</span></td>
-<td>7</td>
-<td>11</td>
-<td>1</td>
-<td>2</td>
-<td>0</td></tr><tr class=""><td class="left">快消标准商家（大紫团队）</td>
-<td>周玲玲</td>
-<td class="bold">6</td>
-<td>6</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>5</td>
-<td><span class="target-ok">83.3%</span><span class="tag-ok">已达标</span></td>
-<td>6</td>
-<td>3</td>
-<td>1</td>
-<td>1</td>
-<td><span class="high-icon">⚠️</span><span class="high-interaction">1</span></td></tr><tr class=""><td class="left">快消标准商家（大紫团队）</td>
-<td>裴玉</td>
-<td class="bold">6</td>
-<td>6</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>5</td>
-<td><span class="target-ok">83.3%</span><span class="tag-ok">已达标</span></td>
-<td>4</td>
-<td>5</td>
-<td>0</td>
-<td>1</td>
-<td>0</td></tr><tr class=""><td class="left">标准商家组</td>
-<td>唐伯文</td>
-<td class="bold">1</td>
-<td>1</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>1</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td></tr><tr class=""><td class="left">标准商家组</td>
-<td>裴玉</td>
-<td class="bold">1</td>
-<td>1</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>0</td>
-<td><span class="target-miss">0.0%</span><span class="tag-need">需加油</span></td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td></tr><tr class=""><td class="left">标准商家组</td>
-<td>赵烈幸</td>
-<td class="bold">1</td>
-<td>1</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>1</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td></tr><tr class="rank-2"><td class="left"><span class="medal silver">2</span>消电&家居</td>
-<td>赵烈幸</td>
-<td class="bold">14</td>
-<td>12</td>
-<td><span class="target-ok">85.7%</span><span class="tag-ok">已达标</span></td>
-<td>11</td>
-<td><span class="target-miss">78.6%</span><span class="tag-need">需加油</span></td>
-<td>9</td>
-<td>10</td>
-<td>2</td>
-<td>2</td>
-<td>0</td></tr><tr class=""><td class="left">消电&家居</td>
-<td>黄豪</td>
-<td class="bold">4</td>
-<td>4</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>4</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>3</td>
-<td>4</td>
-<td>0</td>
-<td>0</td>
-<td>0</td></tr><tr class=""><td class="left">潮玩服饰</td>
-<td>王辉</td>
-<td class="bold">8</td>
-<td>7</td>
-<td><span class="target-ok">87.5%</span><span class="tag-ok">已达标</span></td>
-<td>8</td>
-<td><span class="target-ok">100.0%</span><span class="tag-ok">已达标</span></td>
-<td>7</td>
-<td>8</td>
-<td>0</td>
-<td>0</td>
-<td>0</td></tr><tr class=""><td class="left">潮玩服饰</td>
-<td>马浩楠</td>
-<td class="bold">5</td>
-<td>2</td>
-<td><span class="target-miss">40.0%</span><span class="tag-need">需加油</span></td>
-<td>4</td>
-<td><span class="target-ok">80.0%</span><span class="tag-ok">已达标</span></td>
-<td>5</td>
-<td>4</td>
-<td>1</td>
-<td>0</td>
-<td>0</td></tr><tr class="rank-1"><td class="left"><span class="medal gold">1</span>食品（含冷链）</td>
-<td>唐伯文</td>
-<td class="bold">19</td>
-<td>16</td>
-<td><span class="target-ok">84.2%</span><span class="tag-ok">已达标</span></td>
-<td>17</td>
-<td><span class="target-ok">89.5%</span><span class="tag-ok">已达标</span></td>
-<td>12</td>
-<td>12</td>
-<td>4</td>
-<td>2</td>
-<td><span class="high-icon">⚠️</span><span class="high-interaction">1</span></td></tr><tr class="rank-3"><td class="left"><span class="medal bronze">3</span>食品（含冷链）</td>
-<td>墨岱</td>
-<td class="bold">13</td>
-<td>6</td>
-<td><span class="target-miss">46.2%</span><span class="tag-need">需加油</span></td>
-<td>10</td>
-<td><span class="target-miss">76.9%</span><span class="tag-need">需加油</span></td>
-<td>9</td>
-<td>9</td>
-<td>2</td>
-<td>2</td>
-<td>0</td></tr><tr class="total-row"><td class="left bold">总计</td>
-<td></td>
-<td class="bold">106</td>
-<td>84</td>
-<td><span class="target-miss">79.2%</span><span class="tag-need">需加油</span></td>
-<td>88</td>
-<td><span class="target-ok">83.0%</span><span class="tag-ok">已达标</span></td>
-<td>75</td>
-<td>81</td>
-<td>11</td>
-<td>11</td>
-<td><span class="high-icon">⚠️</span><span class="high-interaction">3</span></td></tr></tbody></table>
-<div class="note">
-  <strong>统计口径说明：</strong><br>
-  · 首轮10分钟内响应率 = <strong>责任人首答响应时长/秒</strong> &lt; 600 秒，目标值 80%（未达标标红并提示“需加油”）<br>
-  · 1小时解决率 = 解决时长/分 &lt; 60 分钟，目标值 80%（未达标标红并提示“需加油”）<br>
-  · 差评工单数 = 服务分 &lt; 5 分 或 是否投诉升级 = 是 或 是否解决 = 否（任一满足即计为差评）<br>
-  · 交互次数分布：人工交互轮次 ≤3 / 4-5 / 6-10 / &gt;10 次（&gt;10 次非零单元格高亮并带警示图标）<br>
-  · 工单量前三（按 dense 排名）分别展示金/银/铜奖牌
-</div>
-</div>
+<script>
+
+    const RAW_DATA = [
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 13.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 44.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 166.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 120.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-22",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 1582.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 3.0,
+    "interactions": 11,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 274.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 47.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 657.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 34.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 281.0,
+    "interactions": 14,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 70.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-01",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "王硕",
+    "firstResponse": 423.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 258.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 350.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 969.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 485.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 333.0,
+    "interactions": 2,
+    "status": "待确认"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 44.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 148.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-15",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 1722.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 83.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "唐伯文",
+    "firstResponse": 321.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 979.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 164.0,
+    "interactions": 12,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 36.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 337.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 14.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 34.0,
+    "interactions": 2,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 177.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-01",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "王硕",
+    "firstResponse": 787.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 92.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 135.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 543.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 109.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 95.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 9.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 348.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-09",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "陈俊羽",
+    "firstResponse": 7.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 82.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 133.0,
+    "interactions": 4,
+    "status": "待确认"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 526.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 142.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 201.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 196.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 172.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 40.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "大美康,健康",
+    "owner": "赵烈幸",
+    "firstResponse": 606.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 898.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 243.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "唐伯文",
+    "firstResponse": 364.0,
+    "interactions": 15,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 329.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 224.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 35.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 76.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 91.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 22.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 295.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 483.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 930.0,
+    "interactions": 0,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 95.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 373.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 301.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 199.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": 35.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 8.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 15.0,
+    "interactions": 26,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "黄春生",
+    "firstResponse": 0.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 27.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 175.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 52.0,
+    "interactions": 12,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 84.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 0.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 810.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 237.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 338.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 52.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 626.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 5.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 14.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 136.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 156.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "裴玉",
+    "firstResponse": 694.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-02",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 984.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 41.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 68.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 95.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 198.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 80.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "赵烈幸",
+    "firstResponse": 0.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 345.0,
+    "interactions": 14,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 329.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,服饰",
+    "owner": "赵烈幸",
+    "firstResponse": 158.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 114.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 1.0,
+    "interactions": 10,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 0.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 21.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "赵烈幸",
+    "firstResponse": 178.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "裴玉",
+    "firstResponse": 923.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 1666.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "马浩楠",
+    "firstResponse": 550.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 192.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-15",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 29.0,
+    "interactions": 4,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 225.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 879.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 370.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 199.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 27.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 610.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 16.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 516.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 71.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 94.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 0.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,潮玩",
+    "owner": "唐伯文",
+    "firstResponse": 73.0,
+    "interactions": 9,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "赵烈幸",
+    "firstResponse": 103.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 23.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 402.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 44.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 1174.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 66.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,服饰",
+    "owner": "周玲玲",
+    "firstResponse": 167.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 242.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 39.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "赵烈幸",
+    "firstResponse": 22.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 657.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 376.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 134.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 579.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 705.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 130.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 165.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 14.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 284.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 208.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 141.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 1633.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 391.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 706.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 310.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 30.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 712.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 52.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 72.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 275.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 13.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "小S",
+    "firstResponse": 0.0,
+    "interactions": 1,
+    "status": "待确认"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 50.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 201.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "黄春生",
+    "firstResponse": null,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": 490.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 277.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 387.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 809.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "裴玉",
+    "firstResponse": 88.0,
+    "interactions": 10,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 65.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 1206.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 453.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 994.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 359.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 436.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 134.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 3062.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 1311.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 95.0,
+    "interactions": 13,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 259.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 290.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "王辉",
+    "firstResponse": 0.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 498.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-15",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 92.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,潮玩",
+    "owner": "周玲玲",
+    "firstResponse": 89.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "黄春生",
+    "firstResponse": null,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 87.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 70.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 312.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 279.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 97.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 265.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 149.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 2044.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 41.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 488.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 39.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 120.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 133.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "裴玉",
+    "firstResponse": 309.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 87.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 25.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 20.0,
+    "interactions": 11,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 249.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 790.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 81.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 100.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 234.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 716.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 27.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 450.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 18.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 418.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 269.0,
+    "interactions": 1,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 905.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 0.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 65.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 36.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 1439.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 45.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 44.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 369.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 13.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 85.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 409.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 88.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 87.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 245.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 87.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 55.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 149.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 14.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 148.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 19.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 147.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 83.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 752.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 92.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 817.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 214.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 64.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 42.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 163.0,
+    "interactions": 10,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 38.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 255.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 618.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 47.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 237.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 92.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 424.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 358.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "唐伯文",
+    "firstResponse": 479.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 11.0,
+    "interactions": 9,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 157.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 285.0,
+    "interactions": 3,
+    "status": "进行中"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "王辉",
+    "firstResponse": 0.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 30.0,
+    "interactions": 15,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 230.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 13.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 339.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 569.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 348.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 1368.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 342.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 13.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 148.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 28.0,
+    "interactions": 5,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "未填写",
+    "owner": "裴玉",
+    "firstResponse": 127.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-09",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "陈俊羽",
+    "firstResponse": 51.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 116.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 35.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "赵烈幸",
+    "firstResponse": 133.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 28.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 665.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-15",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 312.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 410.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 290.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 172.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 148.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 140.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 108.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 320.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "裴玉",
+    "firstResponse": 506.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 280.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 317.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 34.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 123.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 57.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 219.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 184.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "唐伯文",
+    "firstResponse": 431.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 27.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 198.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 475.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 204.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 707.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-09",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "陈俊羽",
+    "firstResponse": 185.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 105.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-01",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": null,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 63.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 327.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "唐伯文",
+    "firstResponse": 280.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 1.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 17.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 552.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 137.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 131.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 106.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 103.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "赵烈幸",
+    "firstResponse": 254.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "王辉",
+    "firstResponse": 169.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "马浩楠",
+    "firstResponse": 1651.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 66.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 168.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": 1287.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-22",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 34.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 96.0,
+    "interactions": 2,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 36.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 964.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 170.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 994.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 402.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 338.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 276.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 96.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 1.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 25.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 46.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 737.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 189.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-22",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 178.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 147.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 292.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": null,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 16.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 132.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 176.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 70.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 323.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 106.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 53.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 38.0,
+    "interactions": 0,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 295.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 711.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 209.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 299.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 497.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "唐伯文",
+    "firstResponse": 288.0,
+    "interactions": 2,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 70.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 54.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 2423.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 388.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 83.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "王辉",
+    "firstResponse": 40.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "唐伯文",
+    "firstResponse": 870.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 249.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 1.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 92.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 124.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-09",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "陈俊羽",
+    "firstResponse": 908.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 75.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 719.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 215.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "赵烈幸",
+    "firstResponse": 97.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 93.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-02",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "黄豪",
+    "firstResponse": 1656.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 108.0,
+    "interactions": 9,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 41.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-22",
+    "tenant": "商家系统运维小蜜",
+    "category": "大美康,美妆",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 101.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 39.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 96.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "赵烈幸",
+    "firstResponse": 111.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 43.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 10.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 71.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-09",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "陈俊羽",
+    "firstResponse": 8.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 470.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 464.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 391.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 20.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 190.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 384.0,
+    "interactions": 11,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 806.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 1198.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 313.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 211.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 69.0,
+    "interactions": 9,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 1832.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 95.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 104.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 601.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 313.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 385.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 421.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 36.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 0.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 37.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 19.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 14.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 74.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 70.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 230.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 46.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 60.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 455.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 706.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 953.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 367.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "赵烈幸",
+    "firstResponse": 141.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": null,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 378.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 516.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "王辉",
+    "firstResponse": 109.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-15",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 44.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 252.0,
+    "interactions": 14,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "赵烈幸",
+    "firstResponse": 68.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 11.0,
+    "interactions": 9,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 112.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 75.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 168.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 421.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 192.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 205.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 80.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 32.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 72.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 42.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 354.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 16.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 186.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 9.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 252.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 54.0,
+    "interactions": 0,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 439.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 299.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 121.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 365.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 486.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 41.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 645.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 54.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "裴玉",
+    "firstResponse": 151.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 199.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 345.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 39.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 432.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 305.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 33.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": null,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 171.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "裴玉",
+    "firstResponse": 15.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": 460.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "王辉",
+    "firstResponse": 349.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 105.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": 459.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "裴玉",
+    "firstResponse": 366.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 77.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 117.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "唐伯文",
+    "firstResponse": 66.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "大猫超,RDC",
+    "owner": "周玲玲",
+    "firstResponse": 2428.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 569.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "王辉",
+    "firstResponse": 889.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 129.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 205.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 988.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 537.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 322.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 311.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 10.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 962.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 712.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 507.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 942.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 128.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "唐伯文",
+    "firstResponse": null,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 538.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 0.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 47.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 146.0,
+    "interactions": 10,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 211.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 0.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 689.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 6.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": 307.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 301.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 57.0,
+    "interactions": 8,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 165.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 16.0,
+    "interactions": 9,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 68.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 207.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 334.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 307.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 327.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": 153.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "裴玉",
+    "firstResponse": 106.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 488.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 1586.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 217.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 290.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 1007.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-22",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 679.0,
+    "interactions": 11,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 83.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 29.0,
+    "interactions": 13,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 130.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 351.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 202.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "裴玉",
+    "firstResponse": 293.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 0.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 88.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "唐伯文",
+    "firstResponse": 511.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,服饰",
+    "owner": "唐伯文",
+    "firstResponse": 4.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 715.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 42.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 12.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 214.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-22",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 210.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-15",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 415.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 865.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 58.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 629.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-02",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "黄豪",
+    "firstResponse": 355.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 68.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 81.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "唐伯文",
+    "firstResponse": 65.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 67.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 429.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 70.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 31.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "唐伯文",
+    "firstResponse": 129.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 276.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 24.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 505.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 300.0,
+    "interactions": 12,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 1987.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 171.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 61.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 32.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 35.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,冷链",
+    "owner": "周玲玲",
+    "firstResponse": 745.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 46.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 229.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 131.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 42.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 28.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 907.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 53.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 99.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "赵烈幸",
+    "firstResponse": 31.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 521.0,
+    "interactions": 10,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 51.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": 734.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 284.0,
+    "interactions": 15,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 464.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 565.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "裴玉",
+    "firstResponse": 124.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 209.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 448.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 1294.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-22",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 34.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 203.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 167.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "唐伯文",
+    "firstResponse": 72.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "唐伯文",
+    "firstResponse": 183.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 348.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": 666.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 56.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 361.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 1949.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 102.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 39.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 60.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 142.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 41.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 365.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 3913.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 561.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 551.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 819.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 8592.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 395.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 201.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 47.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 83.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 770.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 57.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 418.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 383.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "裴玉",
+    "firstResponse": 166.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 789.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 441.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 245.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 462.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-01",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": null,
+    "interactions": 10,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-22",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 27.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 998.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 639.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 42.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 352.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 275.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-09",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "陈俊羽",
+    "firstResponse": 317.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 147.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 83.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "周玲玲",
+    "firstResponse": 984.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 106.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 839.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 180.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 144.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 788.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 85.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-02",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "裴玉",
+    "firstResponse": 454.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 42.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 0.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 279.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 264.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 4.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 181.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "大美康,美妆",
+    "owner": "赵烈幸",
+    "firstResponse": 201.0,
+    "interactions": 1,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 66.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 60.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 48.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 19.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 162.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 164.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 72.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 524.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 113.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 189.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 510.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 502.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 797.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 63.0,
+    "interactions": 9,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,潮玩",
+    "owner": "唐伯文",
+    "firstResponse": 251.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "周玲玲",
+    "firstResponse": 162.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,潮玩",
+    "owner": "陈俊羽",
+    "firstResponse": 133.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 118.0,
+    "interactions": 11,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 70.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 57.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "黄春生",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 59.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 159.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "大猫超,经济",
+    "owner": "唐伯文",
+    "firstResponse": 100.0,
+    "interactions": 21,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 1932.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 37.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 238.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 383.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 0.0,
+    "interactions": 0,
+    "status": "待确认"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 27.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 80.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-15",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 1704.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 175.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-08",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,潮玩",
+    "owner": "裴玉",
+    "firstResponse": 134.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 297.0,
+    "interactions": 13,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 228.0,
+    "interactions": 12,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-02",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": null,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 125.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 158.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-01",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 25799.0,
+    "interactions": 2,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 34.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 150.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 84.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 944.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 618.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 140.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 957.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-13",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 341.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 1186.0,
+    "interactions": 9,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-15",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 275.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 75.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "马浩楠",
+    "firstResponse": 199.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 442.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 154.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "王辉",
+    "firstResponse": 124.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 125.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-06",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,食品",
+    "owner": "唐伯文",
+    "firstResponse": 277.0,
+    "interactions": 7,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 14.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 2716.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-24",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "周玲玲",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-01",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": null,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-23",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,服饰",
+    "owner": "黄豪",
+    "firstResponse": 0.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 335.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 134.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 58.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 79.0,
+    "interactions": 0,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-17",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 110.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 121.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 2.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 536.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 97.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 343.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-10",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 6.0,
+    "interactions": 9,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-15",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,消电",
+    "owner": "黄春生",
+    "firstResponse": 0.0,
+    "interactions": 5,
+    "status": "已关闭"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 419.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-05",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 1204.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 259.0,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-02",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 231.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 577.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-16",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 510.0,
+    "interactions": 8,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-21",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 393.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-14",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 81.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "大快消,家居",
+    "owner": "赵烈幸",
+    "firstResponse": 500.0,
+    "interactions": 5,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-26",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "待确认"
+  },
+  {
+    "date": "2026-08-12",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "小S",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "interactions": 0,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "唐伯文",
+    "firstResponse": 670.0,
+    "interactions": 11,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 16.0,
+    "interactions": 6,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-03",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "周玲玲",
+    "firstResponse": 77.0,
+    "interactions": 2,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-11",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "裴玉",
+    "firstResponse": 29.0,
+    "interactions": 4,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-25",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 472.0,
+    "interactions": 3,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-07",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 245.0,
+    "interactions": 1,
+    "status": "已解决"
+  },
+  {
+    "date": "2026-08-04",
+    "tenant": "商家系统运维小蜜",
+    "category": "标准商家组",
+    "owner": "赵烈幸",
+    "firstResponse": 172.0,
+    "interactions": 4,
+    "status": "已解决"
+  }
+];
+
+    function formatDate(d) {
+      return d.toISOString().split('T')[0];
+    }
+
+    function filterData() {
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      return RAW_DATA.filter(r => r.date >= start && r.date <= end);
+    }
+
+    function computeGroups(rows) {
+      const groups = {};
+      rows.forEach(r => {
+        const key = r.category + '\t' + r.owner;
+        if (!groups[key]) groups[key] = { category: r.category, owner: r.owner, total: 0, firstCount: 0, firstValid: 0, solved: 0, negative: 0, interactions: 0, highInteraction: 0 };
+        const g = groups[key];
+        g.total += 1;
+        if (r.firstResponse !== null && r.firstResponse !== undefined) {
+          g.firstValid += 1;
+          if (r.firstResponse < 600) g.firstCount += 1;
+        }
+        if (r.status === '已解决') g.solved += 1;
+        else g.negative += 1;
+        g.interactions += r.interactions;
+        if (r.interactions > 10) g.highInteraction += 1;
+      });
+      return Object.values(groups);
+    }
+
+    function render() {
+      const rows = filterData();
+      const groups = computeGroups(rows);
+      groups.sort((a, b) => b.total - a.total);
+
+      // totals
+      const total = rows.length;
+      let firstValid = 0, firstOk = 0, solved = 0, negative = 0;
+      rows.forEach(r => {
+        if (r.firstResponse !== null && r.firstResponse !== undefined) {
+          firstValid += 1;
+          if (r.firstResponse < 600) firstOk += 1;
+        }
+        if (r.status === '已解决') solved += 1;
+        else negative += 1;
+      });
+
+      document.getElementById('m-total').textContent = total;
+      document.getElementById('m-first').textContent = (firstValid ? (firstOk/firstValid*100).toFixed(1) : '0.0') + '%';
+      document.getElementById('m-solve').textContent = (total ? (solved/total*100).toFixed(1) : '0.0') + '%';
+      document.getElementById('m-negative').textContent = negative;
+
+      const tbody = document.getElementById('table-body');
+      let html = '';
+      if (groups.length === 0) {
+        html = '<tr><td colspan="10" style="text-align:center;color:#888;">所选日期范围内无数据</td></tr>';
+      } else {
+        groups.forEach((g, idx) => {
+          const rank = idx + 1;
+          let rankCell = rank;
+          let rowClass = '';
+          if (rank === 1) { rankCell = '<span class="medal gold">1</span>'; rowClass = 'rank-1'; }
+          else if (rank === 2) { rankCell = '<span class="medal silver">2</span>'; rowClass = 'rank-2'; }
+          else if (rank === 3) { rankCell = '<span class="medal bronze">3</span>'; rowClass = 'rank-3'; }
+          const firstRate = g.firstValid ? (g.firstCount/g.firstValid*100).toFixed(1) : '0.0';
+          const solveRate = g.total ? (g.solved/g.total*100).toFixed(1) : '0.0';
+          const avgInter = g.total ? (g.interactions/g.total).toFixed(1) : '0.0';
+          const firstClass = parseFloat(firstRate) >= 80 ? 'target-ok' : 'target-miss';
+          const solveClass = parseFloat(solveRate) >= 80 ? 'target-ok' : 'target-miss';
+          const tag = parseFloat(firstRate) >= 80 && parseFloat(solveRate) >= 80
+            ? '<span class="tag-ok">达标</span>' : '<span class="tag-need">需加油</span>';
+          const highWarn = g.highInteraction > 0 ? `<span class="high-interaction"><span class="high-icon">!</span>${g.highInteraction} 单</span>` : '<span style="color:#999;">-</span>';
+          html += `<tr class="${rowClass}"><td class="bold">${rankCell}</td><td class="left">${escapeHtml(g.category)}</td><td class="left bold">${escapeHtml(g.owner)}</td><td>${g.total}</td><td class="${firstClass}">${firstRate}%</td><td class="${solveClass}">${solveRate}%</td><td>${g.negative}</td><td>${avgInter}</td><td>${highWarn}</td><td>${tag}</td></tr>`;
+        });
+        // total row
+        const totalFirstValid = groups.reduce((s,g)=>s+g.firstValid,0);
+        const totalFirstOk = groups.reduce((s,g)=>s+g.firstCount,0);
+        const totalSolved = groups.reduce((s,g)=>s+g.solved,0);
+        const totalNegative = groups.reduce((s,g)=>s+g.negative,0);
+        const totalInter = groups.reduce((s,g)=>s+g.interactions,0);
+        const totalHigh = groups.reduce((s,g)=>s+g.highInteraction,0);
+        const totalFirstRate = totalFirstValid ? (totalFirstOk/totalFirstValid*100).toFixed(1) : '0.0';
+        const totalSolveRate = total ? (totalSolved/total*100).toFixed(1) : '0.0';
+        const totalAvg = total ? (totalInter/total).toFixed(1) : '0.0';
+        html += `<tr><td>—</td><td class="left">合计</td><td class="left">—</td><td>${total}</td><td>${totalFirstRate}%</td><td>${totalSolveRate}%</td><td>${totalNegative}</td><td>${totalAvg}</td><td>${totalHigh > 0 ? totalHigh + ' 单' : '-'}</td><td>—</td></tr>`;
+      }
+      tbody.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('startDate').value = '2026-08-01';
+      document.getElementById('endDate').value = '2026-08-26';
+      render();
+      document.getElementById('startDate').addEventListener('change', render);
+      document.getElementById('endDate').addEventListener('change', render);
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('startDate').value = '2026-08-01';
+        document.getElementById('endDate').value = '2026-08-26';
+        render();
+      });
+    });
+    
+</script>
 </body>
 </html>

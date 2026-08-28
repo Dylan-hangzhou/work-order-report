@@ -17,7 +17,9 @@
     .filters button { background: #3182ce; color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 14px; cursor: pointer; }
     .filters button:hover { background: #2b6cb0; }
     .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 26px; }
-    .metric-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center; }
+    .metric-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center; transition: transform 0.15s, box-shadow 0.15s; }
+    .metric-card.clickable { cursor: pointer; }
+    .metric-card.clickable:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     .metric-label { font-size: 13px; color: #718096; margin-bottom: 8px; }
     .metric-value { font-size: 28px; font-weight: 800; color: #2d3748; }
     .metric-mom { font-size: 12px; color: #718096; margin-top: 6px; }
@@ -53,6 +55,8 @@
     .detail-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
     .detail-toolbar input[type="text"] { flex: 1; min-width: 220px; border: 1px solid #d0d7e2; border-radius: 6px; padding: 7px 12px; font-size: 14px; color: #333; }
     .detail-toolbar .hint { font-size: 12px; color: #718096; }
+    .detail-toolbar label.filter { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #4a5568; cursor: pointer; user-select: none; }
+    .detail-toolbar label.filter input { cursor: pointer; }
     .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 18px; }
     .pagination button { background: #edf2f7; color: #4a5568; border: none; border-radius: 6px; padding: 6px 14px; font-size: 13px; cursor: pointer; }
     .pagination button:hover:not(:disabled) { background: #e2e8f0; }
@@ -86,7 +90,7 @@
     <div class="metric-card"><div class="metric-label">机器人拦截率</div><div class="metric-value" id="m-robot">—</div><div class="metric-mom" id="m-robot-mom">—</div></div>
     <div class="metric-card"><div class="metric-label">首轮10分钟响应率</div><div class="metric-value" id="m-first">—</div><div class="metric-mom" id="m-first-mom">—</div></div>
     <div class="metric-card"><div class="metric-label">1小时解决率</div><div class="metric-value" id="m-solve">—</div><div class="metric-mom" id="m-solve-mom">—</div></div>
-    <div class="metric-card"><div class="metric-label">差评工单数</div><div class="metric-value" id="m-negative">—</div><div class="metric-mom" id="m-negative-mom">—</div></div>
+    <div class="metric-card clickable" id="m-negative-card" title="点击查看差评工单明细"><div class="metric-label">差评工单数</div><div class="metric-value" id="m-negative">—</div><div class="metric-mom" id="m-negative-mom">—</div></div>
   </div>
 
   <div class="tabs">
@@ -117,7 +121,8 @@
 
   <div id="detail-view" class="view">
     <div class="detail-toolbar">
-      <input type="text" id="detailSearch" placeholder="搜索责任人、业务分类、用户提问原文…">
+      <input type="text" id="detailSearch" placeholder="搜索责任人、业务分类、工单名称/总结…">
+      <label class="filter"><input type="checkbox" id="detailBadOnly"> 仅看差评工单</label>
       <span class="hint">日期范围筛选同时作用于明细；共 <span id="detail-count">0</span> 条</span>
     </div>
     <table class="data-table detail-table">
@@ -133,7 +138,7 @@
           <th>会话状态</th>
           <th>是否机器人</th>
           <th>差评</th>
-          <th style="text-align:left;">用户提问原文</th>
+          <th style="text-align:left;">工单名称 / 总结</th>
         </tr>
       </thead>
       <tbody id="detail-body"></tbody>
@@ -157,7 +162,8 @@
     8. 达标标准：首轮10分钟响应率 ≥ 80% 且 1小时解决率 ≥ 80% 且 差评工单数 = 0；评价列会列出未达标项。<br>
     9. 工单量前三的责任人名称后显示金/银/铜奖牌；页面顶部日期范围可实时筛选表格与指标，默认查询范围为当月1日至今。<br>
     10. 指标卡中的月度环比 = 当前所选日期范围指标值 与 往前推一个月的对等日期范围指标值 对比；工单总量和差评工单数显示相对变化百分比，机器人拦截率、响应率、解决率显示百分点（pp）变化。<br>
-    11. 点击「明细视图」可查看当前日期范围内的逐条工单明细，支持按责任人、业务分类、用户提问原文搜索，每页 50 条。
+    11. 点击「明细视图」可查看当前日期范围内的逐条工单明细，字段包括日期、租户、业务分类、责任人、首答响应/会话耗时、交互轮次、会话状态、是否机器人、差评及工单名称/总结（即用户提问原文），每页 50 条；明细视图提供「仅看差评工单」筛选。<br>
+    12. 顶部「差评工单数」指标卡及汇总表中非零的「差评工单数」单元格均可点击，自动跳转至明细视图并仅展示对应的差评工单；点击汇总表单元格时会按该业务分类+责任人进一步过滤。
   </div>
 </div>
 <script>
@@ -67517,6 +67523,9 @@
 
     let currentDetailRows = [];
     let detailPage = 1;
+    let detailBadOnly = false;
+    let detailCategoryFilter = '';
+    let detailOwnerFilter = '';
     const DETAIL_PAGE_SIZE = 50;
 
     function renderSummary() {
@@ -67589,13 +67598,14 @@
             evalHtml = '<span class="tag-need">' + problems.join('、') + ' 未达标</span>';
           }
 
+          const negativeClass = g.negative > 0 ? 'bad-link' : '';
           html += `<tr>
             <td class="left">${escapeHtml(g.category)}</td>
             <td class="left bold">${escapeHtml(g.owner)}${medal}</td>
             <td>${g.total}</td>
             <td class="${firstClass}">${firstRate}%</td>
             <td class="${solveClass}">${solveRate}%</td>
-            <td>${g.negative}</td>
+            <td><span class="${negativeClass}" data-category="${escapeHtml(g.category)}" data-owner="${escapeHtml(g.owner)}" style="${g.negative > 0 ? 'cursor:pointer;color:#c62828;text-decoration:underline;' : ''}">${g.negative}</span></td>
             <td class="dist-cell"><span class="n">${g.interLe3}</span></td>
             <td class="dist-cell"><span class="n">${g.inter45}</span></td>
             <td class="dist-cell"><span class="n">${g.inter610}</span></td>
@@ -67637,6 +67647,15 @@
       const end = document.getElementById('endDate').value;
       const keyword = document.getElementById('detailSearch').value.trim().toLowerCase();
       let rows = RAW_DATA.filter(r => r.date >= start && r.date <= end);
+      if (detailCategoryFilter) {
+        rows = rows.filter(r => r.category === detailCategoryFilter);
+      }
+      if (detailOwnerFilter) {
+        rows = rows.filter(r => r.owner === detailOwnerFilter);
+      }
+      if (detailBadOnly) {
+        rows = rows.filter(r => r.isBad || r.status !== '已解决');
+      }
       if (keyword) {
         rows = rows.filter(r =>
           (r.owner && r.owner.toLowerCase().includes(keyword)) ||
@@ -67649,6 +67668,16 @@
       detailPage = Math.min(detailPage, Math.max(1, Math.ceil(rows.length / DETAIL_PAGE_SIZE)));
       renderDetailPage();
       document.getElementById('detail-count').textContent = rows.length;
+    }
+
+    function showBadDetail(category, owner) {
+      detailCategoryFilter = category || '';
+      detailOwnerFilter = owner || '';
+      detailBadOnly = true;
+      document.getElementById('detailSearch').value = '';
+      document.getElementById('detailBadOnly').checked = true;
+      switchView('detail');
+      renderDetail();
     }
 
     function renderDetailPage() {
@@ -67715,6 +67744,11 @@
       document.getElementById('resetBtn').addEventListener('click', () => {
         document.getElementById('startDate').value = '2026-08-01';
         document.getElementById('endDate').value = '2026-08-28';
+        detailBadOnly = false;
+        detailCategoryFilter = '';
+        detailOwnerFilter = '';
+        document.getElementById('detailBadOnly').checked = false;
+        document.getElementById('detailSearch').value = '';
         render();
       });
       document.querySelectorAll('.tab').forEach(tab => {
@@ -67723,6 +67757,17 @@
       document.getElementById('detailSearch').addEventListener('input', () => {
         detailPage = 1;
         renderDetail();
+      });
+      document.getElementById('detailBadOnly').addEventListener('change', (e) => {
+        detailBadOnly = e.target.checked;
+        detailPage = 1;
+        renderDetail();
+      });
+      document.getElementById('m-negative-card').addEventListener('click', () => showBadDetail('', ''));
+      document.getElementById('table-body').addEventListener('click', (e) => {
+        const el = e.target.closest('.bad-link');
+        if (!el) return;
+        showBadDetail(el.dataset.category, el.dataset.owner);
       });
       document.getElementById('detail-prev').addEventListener('click', () => {
         if (detailPage > 1) { detailPage -= 1; renderDetailPage(); }

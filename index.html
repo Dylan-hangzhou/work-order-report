@@ -20,6 +20,11 @@
     .metric-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center; }
     .metric-label { font-size: 13px; color: #718096; margin-bottom: 8px; }
     .metric-value { font-size: 28px; font-weight: 800; color: #2d3748; }
+    .metric-mom { font-size: 12px; color: #718096; margin-top: 6px; }
+    .metric-mom .arrow { font-weight: 800; margin-right: 2px; }
+    .metric-mom .up { color: #c62828; }
+    .metric-mom .down { color: #2e7d32; }
+    .metric-mom .prev { color: #a0aec0; margin-left: 4px; }
     .data-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); font-size: 14px; }
     .data-table th { background: #edf2f7; color: #4a5568; font-weight: 700; padding: 12px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; }
     .data-table td { padding: 12px 10px; text-align: center; border-bottom: 1px solid #edf2f7; }
@@ -45,7 +50,7 @@
 <body>
 <div class="container">
   <h1>工单统计报表</h1>
-  <div class="subtitle">数据范围：2025-05-30 至 2026-08-26 · 默认查询：2026-08-01 至 2026-08-27 · 数据来源：FBI 多维度数据汇总（1818098）</div>
+  <div class="subtitle">数据范围：2025-05-30 至 2026-08-26 · 默认查询：2026-08-01 至 2026-08-28 · 数据来源：FBI 多维度数据汇总（1818098）</div>
 
   <div class="filters">
     <label for="startDate">开始日期</label>
@@ -56,11 +61,11 @@
   </div>
 
   <div class="metrics">
-    <div class="metric-card"><div class="metric-label">工单总量</div><div class="metric-value" id="m-total">—</div></div>
-    <div class="metric-card"><div class="metric-label">机器人拦截率</div><div class="metric-value" id="m-robot">—</div></div>
-    <div class="metric-card"><div class="metric-label">首轮10分钟响应率</div><div class="metric-value" id="m-first">—</div></div>
-    <div class="metric-card"><div class="metric-label">1小时解决率</div><div class="metric-value" id="m-solve">—</div></div>
-    <div class="metric-card"><div class="metric-label">差评工单数</div><div class="metric-value" id="m-negative">—</div></div>
+    <div class="metric-card"><div class="metric-label">工单总量</div><div class="metric-value" id="m-total">—</div><div class="metric-mom" id="m-total-mom">—</div></div>
+    <div class="metric-card"><div class="metric-label">机器人拦截率</div><div class="metric-value" id="m-robot">—</div><div class="metric-mom" id="m-robot-mom">—</div></div>
+    <div class="metric-card"><div class="metric-label">首轮10分钟响应率</div><div class="metric-value" id="m-first">—</div><div class="metric-mom" id="m-first-mom">—</div></div>
+    <div class="metric-card"><div class="metric-label">1小时解决率</div><div class="metric-value" id="m-solve">—</div><div class="metric-mom" id="m-solve-mom">—</div></div>
+    <div class="metric-card"><div class="metric-label">差评工单数</div><div class="metric-value" id="m-negative">—</div><div class="metric-mom" id="m-negative-mom">—</div></div>
   </div>
 
   <table class="data-table">
@@ -92,7 +97,8 @@
     6. 差评工单数 = 是否差评 =「是」 或 会话状态 ≠「已解决」的工单数（FBI 明细未提供服务分、是否投诉升级字段，以此口径近似）。<br>
     7. 答疑交互次数分布：≤3次、4-5次、6-10次、&gt;10次。<br>
     8. 达标标准：首轮10分钟响应率 ≥ 80% 且 1小时解决率 ≥ 80% 且 差评工单数 = 0；评价列会列出未达标项。<br>
-    9. 工单量前三的责任人名称后显示金/银/铜奖牌；页面顶部日期范围可实时筛选表格与指标，默认查询范围为当月1日至今。
+    9. 工单量前三的责任人名称后显示金/银/铜奖牌；页面顶部日期范围可实时筛选表格与指标，默认查询范围为当月1日至今。<br>
+    10. 指标卡中的月度环比 = 当前所选日期范围指标值 与 往前推一个月的对等日期范围指标值 对比；工单总量和差评工单数显示相对变化百分比，机器人拦截率、响应率、解决率显示百分点（pp）变化。
   </div>
 </div>
 <script>
@@ -62176,12 +62182,6 @@
   }
 ];
 
-    function filterData() {
-      const start = document.getElementById('startDate').value;
-      const end = document.getElementById('endDate').value;
-      return RAW_DATA.filter(r => r.date >= start && r.date <= end);
-    }
-
     function computeGroups(rows) {
       const groups = {};
       rows.forEach(r => {
@@ -62216,8 +62216,80 @@
       return Object.values(groups);
     }
 
+    function addMonths(dateStr, months) {
+      const d = new Date(dateStr + 'T00:00:00');
+      d.setMonth(d.getMonth() + months);
+      return d.toISOString().split('T')[0];
+    }
+
+    function computeOverallMetrics(rows) {
+      let total = rows.length;
+      let robotCount = 0;
+      let firstValid = 0, firstOk = 0, solveValid = 0, solveOk = 0, negative = 0;
+      rows.forEach(r => {
+        if (r.isRobot) robotCount += 1;
+        if (r.firstResponse !== null && r.firstResponse !== undefined) {
+          firstValid += 1;
+          if (r.firstResponse < 600) firstOk += 1;
+        }
+        if (r.solveDuration !== null && r.solveDuration !== undefined) {
+          solveValid += 1;
+          if (r.solveDuration / 60 < 60) solveOk += 1;
+        }
+        if (r.isBad || r.status !== '已解决') negative += 1;
+      });
+      return {
+        total, robotCount,
+        firstValid, firstOk, solveValid, solveOk, negative,
+        robotRate: total ? robotCount / total : 0,
+        firstRate: firstValid ? firstOk / firstValid : 0,
+        solveRate: solveValid ? solveOk / solveValid : 0
+      };
+    }
+
+    function renderMom(curr, prev, type, elId, hasData) {
+      const el = document.getElementById(elId);
+      if (!hasData) {
+        el.textContent = '上月无数据';
+        el.className = 'metric-mom';
+        return;
+      }
+      let changeText, arrowClass, arrow;
+      if (type === 'count') {
+        if (prev === 0) {
+          if (curr === 0) {
+            el.textContent = '与上月持平';
+            el.className = 'metric-mom';
+            return;
+          }
+          arrow = '↑';
+          arrowClass = 'up';
+          changeText = '上月为0';
+        } else {
+          const pct = ((curr - prev) / prev * 100);
+          const isUp = pct >= 0;
+          arrow = isUp ? '↑' : '↓';
+          arrowClass = isUp ? 'up' : 'down';
+          changeText = Math.abs(pct).toFixed(1) + '%';
+        }
+      } else {
+        const pp = (curr - prev) * 100;
+        const isUp = pp >= 0;
+        arrow = isUp ? '↑' : '↓';
+        arrowClass = isUp ? 'up' : 'down';
+        changeText = Math.abs(pp).toFixed(1) + 'pp';
+      }
+      const prevDisplay = type === 'count' ? prev : (prev * 100).toFixed(1) + '%';
+      el.innerHTML = `<span class="arrow ${arrowClass}">${arrow}</span>${changeText}<span class="prev">上月 ${prevDisplay}</span>`;
+    }
+
     function render() {
-      const rows = filterData();
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      const rows = RAW_DATA.filter(r => r.date >= start && r.date <= end);
+      const prevStart = addMonths(start, -1);
+      const prevEnd = addMonths(end, -1);
+      const prevRows = RAW_DATA.filter(r => r.date >= prevStart && r.date <= prevEnd);
       const groups = computeGroups(rows);
 
       // fixed category order, then owner total desc
@@ -62239,27 +62311,20 @@
       const bronze = rankedByTotal[2];
 
       // overall metrics
-      let total = rows.length;
-      let robotCount = 0;
-      let firstValid = 0, firstOk = 0, solveValid = 0, solveOk = 0, negative = 0;
-      rows.forEach(r => {
-        if (r.isRobot) robotCount += 1;
-        if (r.firstResponse !== null && r.firstResponse !== undefined) {
-          firstValid += 1;
-          if (r.firstResponse < 600) firstOk += 1;
-        }
-        if (r.solveDuration !== null && r.solveDuration !== undefined) {
-          solveValid += 1;
-          if (r.solveDuration / 60 < 60) solveOk += 1;
-        }
-        if (r.isBad || r.status !== '已解决') negative += 1;
-      });
+      const curr = computeOverallMetrics(rows);
+      const prev = computeOverallMetrics(prevRows);
 
-      document.getElementById('m-total').textContent = total;
-      document.getElementById('m-robot').textContent = (total ? (robotCount/total*100).toFixed(1) : '0.0') + '%';
-      document.getElementById('m-first').textContent = (firstValid ? (firstOk/firstValid*100).toFixed(1) : '0.0') + '%';
-      document.getElementById('m-solve').textContent = (solveValid ? (solveOk/solveValid*100).toFixed(1) : '0.0') + '%';
-      document.getElementById('m-negative').textContent = negative;
+      document.getElementById('m-total').textContent = curr.total;
+      document.getElementById('m-robot').textContent = (curr.robotRate * 100).toFixed(1) + '%';
+      document.getElementById('m-first').textContent = (curr.firstRate * 100).toFixed(1) + '%';
+      document.getElementById('m-solve').textContent = (curr.solveRate * 100).toFixed(1) + '%';
+      document.getElementById('m-negative').textContent = curr.negative;
+
+      renderMom(curr.total, prev.total, 'count', 'm-total-mom', prevRows.length > 0);
+      renderMom(curr.robotRate, prev.robotRate, 'rate', 'm-robot-mom', prevRows.length > 0);
+      renderMom(curr.firstRate, prev.firstRate, 'rate', 'm-first-mom', prevRows.length > 0);
+      renderMom(curr.solveRate, prev.solveRate, 'rate', 'm-solve-mom', prevRows.length > 0);
+      renderMom(curr.negative, prev.negative, 'count', 'm-negative-mom', prevRows.length > 0);
 
       const tbody = document.getElementById('table-body');
       let html = '';
@@ -62339,13 +62404,13 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('startDate').value = '2026-08-01';
-      document.getElementById('endDate').value = '2026-08-27';
+      document.getElementById('endDate').value = '2026-08-28';
       render();
       document.getElementById('startDate').addEventListener('change', render);
       document.getElementById('endDate').addEventListener('change', render);
       document.getElementById('resetBtn').addEventListener('click', () => {
         document.getElementById('startDate').value = '2026-08-01';
-        document.getElementById('endDate').value = '2026-08-27';
+        document.getElementById('endDate').value = '2026-08-28';
         render();
       });
     });

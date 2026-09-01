@@ -13,7 +13,7 @@
     .subtitle { color: #718096; font-size: 14px; margin-bottom: 20px; }
     .filters { background: #fff; padding: 16px 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 22px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
     .filters label { font-size: 14px; color: #555; font-weight: 600; }
-    .filters input[type="date"] { border: 1px solid #d0d7e2; border-radius: 6px; padding: 6px 10px; font-size: 14px; color: #333; }
+    .filters input[type="date"], .filters select { border: 1px solid #d0d7e2; border-radius: 6px; padding: 6px 10px; font-size: 14px; color: #333; background: #fff; }
     .filters button { background: #3182ce; color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 14px; cursor: pointer; }
     .filters button:hover { background: #2b6cb0; }
     .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 26px; }
@@ -49,6 +49,8 @@
     .tabs { display: flex; gap: 10px; margin-bottom: 18px; }
     .tab { padding: 8px 18px; border: none; background: #e2e8f0; color: #4a5568; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
     .tab.active { background: #3182ce; color: #fff; }
+    .tab.bad { background: #ffebee; color: #c62828; }
+    .tab.bad.active { background: #c62828; color: #fff; }
     .tab:hover:not(.active) { background: #cbd5e0; }
     .view { display: none; }
     .view.active { display: block; }
@@ -75,9 +77,29 @@
 <body>
 <div class="container">
   <h1>工单统计报表</h1>
-  <div class="subtitle">数据范围：2025-05-30 至 2026-08-26 · 默认查询：2026-08-01 至 2026-08-28 · 数据来源：FBI 多维度数据汇总（1818098）</div>
+  <div class="subtitle">数据范围：2025-05-30 至 2026-08-26 · 默认查询：2026-09-01 至 2026-09-01 · 数据来源：FBI 多维度数据汇总（1818098）</div>
 
   <div class="filters">
+    <label for="monthSelect">月份查询</label>
+    <select id="monthSelect">
+      <option value="">选择月份</option>
+      <option value="2025-05">2025-05</option>
+      <option value="2025-06">2025-06</option>
+      <option value="2025-07">2025-07</option>
+      <option value="2025-08">2025-08</option>
+      <option value="2025-09">2025-09</option>
+      <option value="2025-10">2025-10</option>
+      <option value="2025-11">2025-11</option>
+      <option value="2025-12">2025-12</option>
+      <option value="2026-01">2026-01</option>
+      <option value="2026-02">2026-02</option>
+      <option value="2026-03">2026-03</option>
+      <option value="2026-04">2026-04</option>
+      <option value="2026-05">2026-05</option>
+      <option value="2026-06">2026-06</option>
+      <option value="2026-07">2026-07</option>
+      <option value="2026-08" selected>2026-08</option>
+    </select>
     <label for="startDate">开始日期</label>
     <input type="date" id="startDate">
     <label for="endDate">结束日期</label>
@@ -95,7 +117,8 @@
 
   <div class="tabs">
     <button class="tab active" data-view="summary" id="tab-summary">汇总视图</button>
-    <button class="tab" data-view="detail" id="tab-detail">明细视图</button>
+    <button class="tab" data-view="detail" id="tab-detail">全部明细</button>
+    <button class="tab bad" data-view="bad" id="tab-bad">差评明细</button>
   </div>
 
   <div id="summary-view" class="view active">
@@ -67676,7 +67699,7 @@
       detailBadOnly = true;
       document.getElementById('detailSearch').value = '';
       document.getElementById('detailBadOnly').checked = true;
-      switchView('detail');
+      switchView('bad');
       renderDetail();
     }
 
@@ -67721,7 +67744,10 @@
 
     function switchView(viewName) {
       document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === viewName));
-      document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === viewName + '-view'));
+      document.querySelectorAll('.view').forEach(v => {
+        const targetId = viewName === 'bad' ? 'detail-view' : viewName + '-view';
+        v.classList.toggle('active', v.id === targetId);
+      });
     }
 
     function render() {
@@ -67735,24 +67761,73 @@
       return div.innerHTML;
     }
 
+    const AVAILABLE_MONTHS = ["2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08"];
+    const DEFAULT_MONTH = '2026-08';
+
+    function lastDayOfMonth(monthStr) {
+      const [y, m] = monthStr.split('-').map(Number);
+      return new Date(y, m, 0).toISOString().split('T')[0];
+    }
+
+    function syncMonthSelect() {
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      const matched = AVAILABLE_MONTHS.find(month => {
+        const s = month + '-01';
+        return s === start && lastDayOfMonth(month) === end;
+      });
+      document.getElementById('monthSelect').value = matched || '';
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('startDate').value = '2026-08-01';
-      document.getElementById('endDate').value = '2026-08-28';
+      document.getElementById('startDate').value = '2026-09-01';
+      document.getElementById('endDate').value = '2026-09-01';
+      document.getElementById('monthSelect').value = DEFAULT_MONTH;
       render();
-      document.getElementById('startDate').addEventListener('change', render);
-      document.getElementById('endDate').addEventListener('change', render);
+      document.getElementById('startDate').addEventListener('change', () => { syncMonthSelect(); render(); });
+      document.getElementById('endDate').addEventListener('change', () => { syncMonthSelect(); render(); });
+      document.getElementById('monthSelect').addEventListener('change', (e) => {
+        const month = e.target.value;
+        if (month) {
+          document.getElementById('startDate').value = month + '-01';
+          document.getElementById('endDate').value = lastDayOfMonth(month);
+          render();
+        }
+      });
       document.getElementById('resetBtn').addEventListener('click', () => {
-        document.getElementById('startDate').value = '2026-08-01';
-        document.getElementById('endDate').value = '2026-08-28';
+        document.getElementById('startDate').value = '2026-09-01';
+        document.getElementById('endDate').value = '2026-09-01';
+        document.getElementById('monthSelect').value = DEFAULT_MONTH;
         detailBadOnly = false;
         detailCategoryFilter = '';
         detailOwnerFilter = '';
         document.getElementById('detailBadOnly').checked = false;
         document.getElementById('detailSearch').value = '';
+        switchView('summary');
         render();
       });
       document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => switchView(tab.dataset.view));
+        tab.addEventListener('click', () => {
+          const view = tab.dataset.view;
+          if (view === 'bad') {
+            detailCategoryFilter = '';
+            detailOwnerFilter = '';
+            detailBadOnly = true;
+            document.getElementById('detailBadOnly').checked = true;
+            document.getElementById('detailSearch').value = '';
+            detailPage = 1;
+          } else if (view === 'detail') {
+            detailBadOnly = false;
+            document.getElementById('detailBadOnly').checked = false;
+            detailPage = 1;
+          }
+          switchView(view);
+          if (view === 'summary') {
+            renderSummary();
+          } else {
+            renderDetail();
+          }
+        });
       });
       document.getElementById('detailSearch').addEventListener('input', () => {
         detailPage = 1;

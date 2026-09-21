@@ -77,7 +77,7 @@
 <body>
 <div class="container">
   <h1>工单统计报表</h1>
-  <div class="subtitle">数据范围：2025-05-30 至 2026-09-17 · 默认查询：2026-09-01 至 2026-09-17 · 数据来源：FBI 多维度数据汇总（1818098）</div>
+  <div class="subtitle">数据范围：2025-05-30 至 2026-09-20 · 默认查询：2026-09-01 至 2026-09-21 · 数据来源：FBI 多维度数据汇总（1818098）</div>
 
   <div class="filters">
     <label for="monthSelect">月份查询</label>
@@ -126,7 +126,6 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th style="text-align:left;">业务分类</th>
           <th style="text-align:left;">工单责任人</th>
           <th>工单量</th>
           <th>首轮10分钟<br>响应率</th>
@@ -177,19 +176,19 @@
 
   <div class="note">
     <strong>口径说明</strong><br>
-    1. 数据来源：FBI 报表 1818098「FY26财年答疑小蜜汇总」-> 小蜜答疑明细，日期范围 2025-05-30 至 2026-09-17，租户仅包含「商家系统运维小蜜」和「菜鸟/全球供应链/进口供应链」。<br>
-    2. 业务分类：菜鸟/全球供应链/进口供应链默认「进口供应链」；商家系统运维小蜜从「用户提问表单」JSON 中的业务分类字段提取，无法提取时沿用原字段；仅展示上述六个固定分类，其余归入「其他」；同一分类内按工单量降序排列。<br>
+    1. 数据来源：FBI 报表 1818098「FY26财年答疑小蜜汇总」-> 小蜜答疑明细，日期范围 2025-05-30 至 2026-09-20，租户仅包含「商家系统运维小蜜」和「菜鸟/全球供应链/进口供应链」。<br>
+    2. 汇总视图按工单责任人汇总（不区分业务分类）；明细视图仍保留每条工单的业务分类字段。业务分类提取规则：菜鸟/全球供应链/进口供应链默认「进口供应链」；商家系统运维小蜜从「用户提问表单」JSON 中的业务分类字段提取，无法提取时沿用原字段；上述六个固定分类之外的归入「其他」。<br>
     3. 机器人拦截率 = 是否机器人 =「是」的工单量 / 工单总量；该指标反映机器人直接拦截或处理的工单占比。<br>
     4. 首轮10分钟响应率 = 责任人首答响应时间 &lt; 600 秒（10分钟）的工单 / 有首答响应时间的工单。<br>
     5. 1小时解决率 = 解决时长 &lt; 3600 秒（60分钟）的工单 / 有解决时长的工单；明细优先使用「解决时长_秒」，若该字段缺失则回退到「责任人会话耗时」。<br>
     6. 差评工单数 = 是否差评 =「是」 或 会话状态 ≠「已解决」的工单数（FBI 明细未提供服务分、是否投诉升级字段，以此口径近似）。<br>
     7. 答疑交互次数分布：≤3次、4-5次、6-10次、&gt;10次。<br>
     8. 达标标准：首轮10分钟响应率 ≥ 80% 且 1小时解决率 ≥ 80% 且 差评工单数 = 0；评价列会列出未达标项。<br>
-    9. 工单量前三的责任人名称后显示金/银/铜奖牌；页面顶部日期范围可实时筛选表格与指标，默认查询范围为当月1日至今。<br>
+    9. 汇总视图按工单责任人汇总，工单量前三的责任人名称后显示金/银/铜奖牌；页面顶部日期范围可实时筛选表格与指标，默认查询范围为当月1日至今。<br>
     10. 指标卡中的月度环比 = 当前所选日期范围指标值 与 往前推一个月的对等日期范围指标值 对比；工单总量和差评工单数显示相对变化百分比，机器人拦截率、响应率、解决率显示百分点（pp）变化。<br>
     11. 顶部 TAB 可在「汇总视图」「全部明细」「差评明细」之间切换；「差评明细」直接展示当前日期范围内的差评工单，不显示在明细列表末尾。<br>
     12. 点击「明细视图」或「全部明细」可查看当前日期范围内的逐条工单明细，字段包括日期、租户、业务分类、责任人、首答响应/解决时长、交互轮次、会话状态、是否机器人、差评、小蜜ID（可点击跳转会话详情）及工单名称/总结（即用户提问原文），每页 50 条；明细视图仍保留「仅看差评工单」复选框。<br>
-    13. 顶部「差评工单数」指标卡及汇总表中非零的「差评工单数」单元格均可点击，自动跳转至「差评明细」并仅展示对应的差评工单；点击汇总表单元格时会按该业务分类+责任人进一步过滤。<br>
+    13. 顶部「差评工单数」指标卡及汇总表中非零的「差评工单数」单元格均可点击，自动跳转至「差评明细」并仅展示对应的差评工单；点击汇总表单元格时会按该责任人进一步过滤。<br>
     14. 筛选区新增「月份查询」下拉框，选择月份后自动将日期范围设置为该月 1 日至最后一日，并同步刷新汇总与明细数据。
   </div>
 </div>
@@ -81535,16 +81534,1346 @@
     "isRobot": true,
     "question": "未填写",
     "xiaomiId": "6aaac00c45bc1504a35157a6"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 190.0,
+    "solveDuration": 190.0,
+    "interactions": 5,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aace2b40f1ab804a3e35ab2"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 684.0,
+    "solveDuration": 684.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf762dd70a4704a152e632"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 278.0,
+    "solveDuration": 278.0,
+    "interactions": 5,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf54767caeb204a082e85b"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 391.0,
+    "solveDuration": 391.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf940e31a77804a2724d83"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 75.0,
+    "solveDuration": 75.0,
+    "interactions": 3,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacf278ae6b1f04a5b41a58"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 51.0,
+    "solveDuration": 51.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae2f8d0083b704a2c26087"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "裴玉",
+    "firstResponse": null,
+    "solveDuration": null,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacf6c435c1c404a1e40883"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "周玲玲",
+    "firstResponse": 102.0,
+    "solveDuration": 102.0,
+    "interactions": 4,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae536caef79d049ecc9c11"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 294.0,
+    "solveDuration": 294.0,
+    "interactions": 4,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf6de68c3e4b04b5f5b412"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 43.0,
+    "solveDuration": 43.0,
+    "interactions": 3,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf9361e4f34b04a12a3b2a"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 141.0,
+    "solveDuration": 141.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf6f49b18675049ddfb7cd"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 25.0,
+    "solveDuration": 25.0,
+    "interactions": 4,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaca2cb2f08fc04a1b1198a"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 638.0,
+    "solveDuration": 638.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacd2ca29bf0104a38c2f15"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 70.0,
+    "solveDuration": 70.0,
+    "interactions": 7,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf73a10f1ab8049e477fbc"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "solveDuration": null,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacfafe45bc1504a4388dc3"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 6.0,
+    "solveDuration": 6.0,
+    "interactions": 8,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf8cf7b18675049ddfe82b"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "王辉",
+    "firstResponse": 98.0,
+    "solveDuration": 98.0,
+    "interactions": 5,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf7412c1ec2f04a40708fb"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 10.0,
+    "solveDuration": 10.0,
+    "interactions": 8,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacd99603fdba04a31260e9"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 971.0,
+    "solveDuration": 971.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaca662a868e904a4d43535"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "马浩楠",
+    "firstResponse": 2547.0,
+    "solveDuration": 2547.0,
+    "interactions": 3,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacdc41ae1b1e04a2b9e8e0"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "周玲玲",
+    "firstResponse": 756.0,
+    "solveDuration": 756.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae00be4726bb04a26d713d"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 37.0,
+    "solveDuration": 37.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaccbbcc5e8dc04a604b24d"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 94.0,
+    "solveDuration": 94.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacd0ad72cbe804a2db957b"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 0.0,
+    "solveDuration": 0.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae67d47a4f5404a3b29bf9"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 64.0,
+    "solveDuration": 64.0,
+    "interactions": 3,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aac9116638e4004a6075105"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "其他",
+    "owner": "马浩楠",
+    "firstResponse": 178.0,
+    "solveDuration": 178.0,
+    "interactions": 3,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf4097ae6b1f04b93fb91c"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 31.0,
+    "solveDuration": 31.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaccd8b03901a04b7075216"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 288.0,
+    "solveDuration": 288.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf8e2b140d1504a6941674"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 41.0,
+    "solveDuration": 41.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aac9f36896be704a37c92a8"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "其他",
+    "owner": "周玲玲",
+    "firstResponse": 71.0,
+    "solveDuration": 71.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae2323b18675049ddf00f0"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "小S",
+    "firstResponse": null,
+    "solveDuration": null,
+    "interactions": 0,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": true,
+    "question": "未填写",
+    "xiaomiId": "6aafbc202ac9bb04a1c5bd9b"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "王辉",
+    "firstResponse": 251.0,
+    "solveDuration": 251.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf456b8f83b504a02812ba"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 2.0,
+    "solveDuration": 2.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacf57eb5893904a5b84fd0"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "裴玉",
+    "firstResponse": 113.0,
+    "solveDuration": 113.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aac9e444d93a904a442a661"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 440.0,
+    "solveDuration": 440.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aac97d73e060004a4cae3f4"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 0.0,
+    "solveDuration": 0.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacb6c8a5709804a3f6b09a"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "周玲玲",
+    "firstResponse": 43.0,
+    "solveDuration": 43.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae327fc5c71604a714f81c"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 375.0,
+    "solveDuration": 375.0,
+    "interactions": 0,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aafac4529bf0104a02326f2"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 183.0,
+    "solveDuration": 183.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae4f336b64dc04a1e555e1"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 52.0,
+    "solveDuration": 52.0,
+    "interactions": 4,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf427b76d97804a2bad426"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 138.0,
+    "solveDuration": 138.0,
+    "interactions": 3,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf8527ff4cb204a79fd584"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 39.0,
+    "solveDuration": 39.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacad9c31a77804a24534d5"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 32.0,
+    "solveDuration": 32.0,
+    "interactions": 4,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacde8222353704a2d0b05e"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "其他",
+    "owner": "周玲玲",
+    "firstResponse": 0.0,
+    "solveDuration": 0.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae5e2831a77804a271bfd5"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 284.0,
+    "solveDuration": 284.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf5f8c1460450496cc4a36"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 140.0,
+    "solveDuration": 140.0,
+    "interactions": 7,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf43c53a684704a265fd79"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "小S",
+    "firstResponse": null,
+    "solveDuration": null,
+    "interactions": 0,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": true,
+    "question": "未填写",
+    "xiaomiId": "6aafbd9d7c2ac9049d39efea"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 35.0,
+    "solveDuration": 35.0,
+    "interactions": 6,
+    "status": "HANGUP",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf9d74b8652a04a2136a93"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 37.0,
+    "solveDuration": 37.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aace47903fdba04a312697d"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 190.0,
+    "solveDuration": 190.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf3c7876d97804a2bacf35"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 536.0,
+    "solveDuration": 536.0,
+    "interactions": 5,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae56f86d2fb5049fd4d8fc"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 254.0,
+    "solveDuration": 254.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aac95ce0a71fe04a7135112"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "裴玉",
+    "firstResponse": 52.0,
+    "solveDuration": 52.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf9211cf3c4004a2452edd"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 209.0,
+    "solveDuration": 209.0,
+    "interactions": 5,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aace66d4228e1049f34e224"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 17.0,
+    "solveDuration": 17.0,
+    "interactions": 5,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf3f1923206204a3270aac"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 67.0,
+    "solveDuration": 67.0,
+    "interactions": 3,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aafa3e68a8bf2049fda84ea"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "其他",
+    "owner": "周玲玲",
+    "firstResponse": 1546.0,
+    "solveDuration": 1546.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aadfc4fcf3c4004a243a7c8"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 379.0,
+    "solveDuration": 379.0,
+    "interactions": 3,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf4a2e2f08fc04a1996014"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 48.0,
+    "solveDuration": 48.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacb1d01603f204a14bcea7"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 185.0,
+    "solveDuration": 185.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf57f213011c04a1b310f2"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 18.0,
+    "solveDuration": 18.0,
+    "interactions": 1,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aafa0d83a684704a2663cf3"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 26.0,
+    "solveDuration": 26.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacf4fc59574e04a1718eaf"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 793.0,
+    "solveDuration": 793.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae449c249e2204a2a8306f"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "小S",
+    "firstResponse": null,
+    "solveDuration": null,
+    "interactions": 0,
+    "status": "已关闭",
+    "isBad": false,
+    "isRobot": true,
+    "question": "未填写",
+    "xiaomiId": "6aae2f0c3a684704a265c561"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 278.0,
+    "solveDuration": 278.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacb4c2fc8b3104a4b607b8"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "小S",
+    "firstResponse": null,
+    "solveDuration": null,
+    "interactions": 0,
+    "status": "已关闭",
+    "isBad": false,
+    "isRobot": true,
+    "question": "未填写",
+    "xiaomiId": "6aae2d352fe95b04a216bd7d"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 28.0,
+    "solveDuration": 28.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf9a3d892a9204a1012334"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 67.0,
+    "solveDuration": 67.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaded5e33a1cb04a8dfd316"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "马浩楠",
+    "firstResponse": 706.0,
+    "solveDuration": 706.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf4385ae1b1e04a31027fa"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 146.0,
+    "solveDuration": 146.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aafad1623206204a3276158"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "小S",
+    "firstResponse": null,
+    "solveDuration": null,
+    "interactions": 0,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": true,
+    "question": "未填写",
+    "xiaomiId": "6aafc30ec9595204a13f9058"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 6.0,
+    "solveDuration": 6.0,
+    "interactions": 13,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf8268cf3c4004a2451eef"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 39.0,
+    "solveDuration": 39.0,
+    "interactions": 8,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf3a386d2fb5049fd4fce9"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 207.0,
+    "solveDuration": 207.0,
+    "interactions": 9,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae4c26ff4cb204a79f7fb8"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "其他",
+    "owner": "周玲玲",
+    "firstResponse": 37.0,
+    "solveDuration": 37.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae107f592e3204a3aab52c"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 95.0,
+    "solveDuration": 95.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaccf8fc0cc2404a1f82dbe"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "唐伯文",
+    "firstResponse": 12.0,
+    "solveDuration": 12.0,
+    "interactions": 1,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aafa9a87c2ac9049d39e3bc"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 51.0,
+    "solveDuration": 51.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacf6ecee0b7104a1d540b6"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "周玲玲",
+    "firstResponse": 264.0,
+    "solveDuration": 264.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae5715f54c9004a62a1e1a"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "周玲玲",
+    "firstResponse": 249.0,
+    "solveDuration": 249.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae23afee0b7104a7c5f4fb"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 55.0,
+    "solveDuration": 55.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf8b203e060004a2d7e515"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "其他",
+    "owner": "周玲玲",
+    "firstResponse": 0.0,
+    "solveDuration": 0.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae6cb3c5e8dc04a1b7ecec"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "裴玉",
+    "firstResponse": 0.0,
+    "solveDuration": 0.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aad1067e7364904a544aa4b"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "周玲玲",
+    "firstResponse": 503.0,
+    "solveDuration": 503.0,
+    "interactions": 0,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aad0d91c9595204a2bee8a8"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "马浩楠",
+    "firstResponse": null,
+    "solveDuration": null,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacfab745bc1504a4388cee"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "菜鸟/全球供应链/进口供应链",
+    "category": "进口供应链",
+    "owner": "李冰",
+    "firstResponse": 257.0,
+    "solveDuration": 257.0,
+    "interactions": 5,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aac977336404704a559c402"
+  },
+  {
+    "date": "2026-09-19",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "周玲玲",
+    "firstResponse": 207.0,
+    "solveDuration": 207.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aae4a4a74359604a2cb001e"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "小S",
+    "firstResponse": null,
+    "solveDuration": null,
+    "interactions": 0,
+    "status": "待确认",
+    "isBad": false,
+    "isRobot": true,
+    "question": "未填写",
+    "xiaomiId": "6aafbd526b916e049f18b34a"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "张杭萍",
+    "firstResponse": 160.0,
+    "solveDuration": 160.0,
+    "interactions": 2,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aace91008b84f049c1431d8"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "赵烈幸",
+    "firstResponse": 114.0,
+    "solveDuration": 114.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf9db3f54c9004a62a84af"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "快消标准商家（大紫团队）",
+    "owner": "裴玉",
+    "firstResponse": 17.0,
+    "solveDuration": 17.0,
+    "interactions": 1,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaca514178c3704a82145f4"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "潮玩服饰",
+    "owner": "王辉",
+    "firstResponse": 63.0,
+    "solveDuration": 63.0,
+    "interactions": 4,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aacf1ffd9e21104a4790b3c"
+  },
+  {
+    "date": "2026-09-18",
+    "tenant": "商家系统运维小蜜",
+    "category": "食品（含冷链）",
+    "owner": "唐伯文",
+    "firstResponse": 246.0,
+    "solveDuration": 246.0,
+    "interactions": 4,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaceb2e892a9204a03ca57d"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "消电&家居",
+    "owner": "黄豪",
+    "firstResponse": 19.0,
+    "solveDuration": 19.0,
+    "interactions": 3,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf7288791fa504a59252f1"
+  },
+  {
+    "date": "2026-09-20",
+    "tenant": "商家系统运维小蜜",
+    "category": "M2C及猫超外单",
+    "owner": "裴玉",
+    "firstResponse": 60.0,
+    "solveDuration": 60.0,
+    "interactions": 4,
+    "status": "已解决",
+    "isBad": false,
+    "isRobot": false,
+    "question": "未填写",
+    "xiaomiId": "6aaf44d7412dcb04a166aaf0"
   }
 ];
 
     function computeGroups(rows) {
       const groups = {};
       rows.forEach(r => {
-        const key = r.category + '\t' + r.owner;
+        const key = r.owner;
         if (!groups[key]) {
           groups[key] = {
-            category: r.category, owner: r.owner, total: 0,
+            owner: r.owner, total: 0,
             firstValid: 0, firstOk: 0,
             solveValid: 0, solveOk: 0,
             negative: 0,
@@ -81655,23 +82984,13 @@
       const prevRows = RAW_DATA.filter(r => r.date >= prevStart && r.date <= prevEnd);
       const groups = computeGroups(rows);
 
-      // fixed category order, then owner total desc
-      const ORDER = ["快消标准商家（大紫团队）", "食品（含冷链）", "消电&家居", "潮玩服饰", "M2C及猫超外单", "进口供应链", "其他"];
-      function catIndex(c) {
-        const i = ORDER.indexOf(c);
-        return i === -1 ? ORDER.length : i;
-      }
-      groups.sort((a, b) => {
-        const c = catIndex(a.category) - catIndex(b.category);
-        if (c !== 0) return c;
-        return b.total - a.total;
-      });
+      // sort by owner total desc
+      groups.sort((a, b) => b.total - a.total);
 
-      // top 3 owners by ticket volume across all groups
-      const rankedByTotal = [...groups].sort((a, b) => b.total - a.total);
-      const gold = rankedByTotal[0];
-      const silver = rankedByTotal[1];
-      const bronze = rankedByTotal[2];
+      // top 3 owners by ticket volume
+      const gold = groups[0];
+      const silver = groups[1];
+      const bronze = groups[2];
 
       // overall metrics
       const curr = computeOverallMetrics(rows);
@@ -81692,7 +83011,7 @@
       const tbody = document.getElementById('table-body');
       let html = '';
       if (groups.length === 0) {
-        html = '<tr><td colspan="12" style="text-align:center;color:#888;">所选日期范围内无数据</td></tr>';
+        html = '<tr><td colspan="10" style="text-align:center;color:#888;">所选日期范围内无数据</td></tr>';
       } else {
         groups.forEach((g, idx) => {
           let medal = '';
@@ -81716,14 +83035,12 @@
             evalHtml = '<span class="tag-need">' + problems.join('、') + ' 未达标</span>';
           }
 
-          const negativeClass = g.negative > 0 ? 'bad-link' : '';
           html += `<tr>
-            <td class="left">${escapeHtml(g.category)}</td>
             <td class="left bold">${escapeHtml(g.owner)}${medal}</td>
             <td>${g.total}</td>
             <td class="${firstClass}">${firstRate}%</td>
             <td class="${solveClass}">${solveRate}%</td>
-            <td><span class="${negativeClass}" data-category="${escapeHtml(g.category)}" data-owner="${escapeHtml(g.owner)}" style="${g.negative > 0 ? 'cursor:pointer;color:#c62828;text-decoration:underline;' : ''}">${g.negative}</span></td>
+            <td><span class="${g.negative > 0 ? 'bad-link' : ''}" data-owner="${escapeHtml(g.owner)}" style="${g.negative > 0 ? 'cursor:pointer;color:#c62828;text-decoration:underline;' : ''}">${g.negative}</span></td>
             <td class="dist-cell"><span class="n">${g.interLe3}</span></td>
             <td class="dist-cell"><span class="n">${g.inter45}</span></td>
             <td class="dist-cell"><span class="n">${g.inter610}</span></td>
@@ -81745,7 +83062,6 @@
         const totalSolveRate = totalSolveValid ? (totalSolveOk/totalSolveValid*100).toFixed(1) : '0.0';
         html += `<tr>
           <td class="left">合计</td>
-          <td class="left">—</td>
           <td>${curr.total}</td>
           <td>${totalFirstRate}%</td>
           <td>${totalSolveRate}%</td>
@@ -81878,7 +83194,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('startDate').value = '2026-09-01';
-      document.getElementById('endDate').value = '2026-09-17';
+      document.getElementById('endDate').value = '2026-09-21';
       document.getElementById('monthSelect').value = DEFAULT_MONTH;
       render();
       document.getElementById('startDate').addEventListener('change', () => { syncMonthSelect(); render(); });
@@ -81893,7 +83209,7 @@
       });
       document.getElementById('resetBtn').addEventListener('click', () => {
         document.getElementById('startDate').value = '2026-09-01';
-        document.getElementById('endDate').value = '2026-09-17';
+        document.getElementById('endDate').value = '2026-09-21';
         document.getElementById('monthSelect').value = DEFAULT_MONTH;
         detailBadOnly = false;
         detailCategoryFilter = '';
@@ -81939,7 +83255,7 @@
       document.getElementById('table-body').addEventListener('click', (e) => {
         const el = e.target.closest('.bad-link');
         if (!el) return;
-        showBadDetail(el.dataset.category, el.dataset.owner);
+        showBadDetail('', el.dataset.owner);
       });
       document.getElementById('detail-prev').addEventListener('click', () => {
         if (detailPage > 1) { detailPage -= 1; renderDetailPage(); }

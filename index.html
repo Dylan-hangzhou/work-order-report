@@ -82890,7 +82890,7 @@
           g.solveValid += 1;
           if (r.solveDuration / 60 < 60) g.solveOk += 1;
         }
-        if (r.isBad || r.status !== '已解决') g.negative += 1;
+        if (r.isBad) g.negative += 1;
 
         const n = r.interactions;
         if (n <= 3) g.interLe3 += 1;
@@ -82921,7 +82921,7 @@
           solveValid += 1;
           if (r.solveDuration / 60 < 60) solveOk += 1;
         }
-        if (r.isBad || r.status !== '已解决') negative += 1;
+        if (r.isBad) negative += 1;
       });
       return {
         total, robotCount,
@@ -83088,7 +83088,7 @@
         rows = rows.filter(r => r.owner === detailOwnerFilter);
       }
       if (detailBadOnly) {
-        rows = rows.filter(r => r.isBad || r.status !== '已解决');
+        rows = rows.filter(r => r.isBad);
       }
       if (keyword) {
         rows = rows.filter(r =>
@@ -83129,7 +83129,7 @@
           const first = r.firstResponse !== null && r.firstResponse !== undefined ? r.firstResponse : '—';
           const solve = r.solveDuration !== null && r.solveDuration !== undefined ? r.solveDuration : '—';
           const robotBadge = r.isRobot ? '<span class="badge badge-robot">机器人</span>' : '<span class="badge badge-ok">人工</span>';
-          const badBadge = r.isBad || r.status !== '已解决' ? '<span class="badge badge-bad">是</span>' : '<span class="badge badge-ok">否</span>';
+          const badBadge = r.isBad ? '<span class="badge badge-bad">是</span>' : '<span class="badge badge-ok">否</span>';
           const question = r.question ? escapeHtml(r.question) : '<span style="color:#a0aec0;">—</span>';
           const xiaomiLink = r.xiaomiId ? `<a href="https://links.alipay.com/support/conversation/${encodeURIComponent(r.xiaomiId)}" target="_blank" rel="noopener" style="font-size:12px;color:#3182ce;">${escapeHtml(r.xiaomiId)}</a>` : '<span style="color:#a0aec0;">—</span>';
           html += `<tr>
